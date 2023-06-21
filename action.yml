@@ -46,13 +46,17 @@ runs:
       shell: bash
       run: |
         if [ ${{ inputs.add_repos }} = true ]; then
+          cd src
           lua fetch-repos.lua ${{ inputs.repos_filename }}
+          cd ..
         fi
     - name: Update all repositories
       shell: bash
       run: |
         if [ ${{ inputs.update_repos }} = true ]; then
+          cd src
           lua update-repos.lua ${{ inputs.repos_filename }}
+          cd ..
         fi
     - name: Commit and push changes
       shell: bash

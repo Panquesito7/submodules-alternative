@@ -17,7 +17,9 @@
 -- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 --
 
+package.path = package.path .. ";../?.lua"
 local data = require(arg[1])
+
 local repos = data.repos
 local check_variables = require("check-variables").check_variables
 
