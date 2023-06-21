@@ -3,7 +3,7 @@ description: "Adds/updates all repositories added by the Submodules Alternative 
 author: "Panquesito7"
 inputs:
   repos_filename:
-    description: "The filename used to obtain the repository data (no file format is required).",
+    description: "The filename used to obtain the repository data (no file format is required)."
     required: true
     default: "repos"
   use_pr:
