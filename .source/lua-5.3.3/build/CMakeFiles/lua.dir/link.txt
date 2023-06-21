@@ -1,0 +1,1 @@
+/usr/bin/cc -rdynamic CMakeFiles/lua.dir/src/lua.c.o -o lua  -Wl,-rpath,/home/runner/work/submodules-alternative/submodules-alternative/.source/lua-5.3.3/build: liblua.so -lm -Wl,-Bstatic -ldl -Wl,-Bdynamic -lreadline 

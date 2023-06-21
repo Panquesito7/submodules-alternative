@@ -1,0 +1,11 @@
+/home/runner/work/submodules-alternative/submodules-alternative/.source/lua-5.3.3/build/CMakeFiles/liblua.dir
+/home/runner/work/submodules-alternative/submodules-alternative/.source/lua-5.3.3/build/CMakeFiles/lua.dir
+/home/runner/work/submodules-alternative/submodules-alternative/.source/lua-5.3.3/build/CMakeFiles/luac.dir
+/home/runner/work/submodules-alternative/submodules-alternative/.source/lua-5.3.3/build/CMakeFiles/package.dir
+/home/runner/work/submodules-alternative/submodules-alternative/.source/lua-5.3.3/build/CMakeFiles/package_source.dir
+/home/runner/work/submodules-alternative/submodules-alternative/.source/lua-5.3.3/build/CMakeFiles/edit_cache.dir
+/home/runner/work/submodules-alternative/submodules-alternative/.source/lua-5.3.3/build/CMakeFiles/rebuild_cache.dir
+/home/runner/work/submodules-alternative/submodules-alternative/.source/lua-5.3.3/build/CMakeFiles/list_install_components.dir
+/home/runner/work/submodules-alternative/submodules-alternative/.source/lua-5.3.3/build/CMakeFiles/install.dir
+/home/runner/work/submodules-alternative/submodules-alternative/.source/lua-5.3.3/build/CMakeFiles/install/local.dir
+/home/runner/work/submodules-alternative/submodules-alternative/.source/lua-5.3.3/build/CMakeFiles/install/strip.dir
