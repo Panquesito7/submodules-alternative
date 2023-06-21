@@ -28,6 +28,16 @@ local check_variables = require("check-variables").check_variables
 --- This script can be ran multiple times without any issues.
 --- @return nil
 local function clone_repos()
+    -- Hack to clone the repositories in the correct directory.
+    local handle = io.popen("pwd")
+    local prev_dir
+    if handle then
+        prev_dir = handle:read("*a")
+        handle:close()
+    end
+
+    os.execute("cd ..")
+
     for i = 1, #repos do
         -- Make sure all of the variables are set.
         check_variables(repos, i)
@@ -47,6 +57,8 @@ local function clone_repos()
 
         ::continue::
     end
+
+    os.execute("cd " .. prev_dir)
 end
 
 -- Clone the given repositories.
