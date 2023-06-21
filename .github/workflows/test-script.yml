@@ -1,0 +1,17 @@
+name: Verify that the script works
+on: [workflow_dispatch]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: Panquesito7/submodules-alternative@v1
+        with:
+          repos_filename: repos-test
+          use_pr: true
+          branch_name: submodule-update
+          add_repos: true
+          update_repos: true
+          squash_commits: true
