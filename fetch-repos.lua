@@ -40,12 +40,23 @@ local function clone_repos()
             goto continue
         end
 
-        -- Obtain the default branch name from the given URL by using `git remote show`.
-        local handle = io.popen("git ls-remote --heads " .. repos[i].url .. " | grep -v HEAD | cut -d'/' -f3")
+        -- Include only the repository owner and name (e.g.: panqkart/panqkart).
+        local owner, repo = repos[i].url:match("https://github.com/(.-)/(.-)$")
+
+        -- Remove `.git` from `owner`.
+        repo = repo:gsub(".git", "")
+
+        -- Obtain the default branch name from the given URL by fetching the GitHub API.
+        local handle = io.popen("wget -q -O - \"\"https://api.github.com/repos/" .. owner .. "/" .. repo .. "\"\" | jq -r '.default_branch'")
         if handle then
             branch = handle:read("*a")
             handle:close()
+        else
+            print("Error: Could not obtain the default branch name from the given URL.")
+            os.exit(1)
         end
+
+        print(branch)
 
         -- Use `git subtree` to avoid the repo being converted to a submodule.
         os.execute("git subtree add --prefix " .. repos[i].dir .. repos[i].name .. " " .. repos[i].url .. " " .. branch .. " --squash")

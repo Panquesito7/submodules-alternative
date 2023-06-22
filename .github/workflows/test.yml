@@ -9,7 +9,7 @@ jobs:
           fetch-depth: 0
       - uses: Panquesito7/submodules-alternative@dev
         with:
-          repos_filename: test
+          repos_filename: repos
           use_pr: true
           branch_name: submodule-update
           commit_message: "Update repositories"
