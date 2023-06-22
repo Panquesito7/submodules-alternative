@@ -58,14 +58,15 @@ runs:
       shell: bash
       run: |
         git add .
-        git commit -m "${{ inputs.commit_message }}"
+        git commit -m "${{ inputs.commit_message }}" || true
         if [ ${{ inputs.use_pr }} = true ]; then
-          git checkout -b ${{ inputs.branch_name }}
-          git push origin ${{ inputs.branch_name }}:${{ inputs.branch_name }}
+          git branch ${{ inputs.branch_name }} || true
+          git checkout ${{ inputs.branch_name }}
+          git push origin ${{ inputs.branch_name }}:${{ inputs.branch_name }} || true
 
           gh pr create --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} --title '${{ inputs.commit_message }}' --body 'Submodules were added or updated using the Submodules Alternative tool.' || true
         else
-          git push
+          git push || true
         fi
       env:
         GH_TOKEN: ${{ github.token }}

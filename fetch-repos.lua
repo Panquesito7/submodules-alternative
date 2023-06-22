@@ -32,6 +32,9 @@ local function clone_repos()
         -- Make sure all of the variables are set.
         check_variables(repos, i)
 
+        -- Create the given directory if it does not exist.
+        os.execute("mkdir -p " .. repos[i].dir)
+
         -- Make sure the repository is not cloned already.
         if os.execute("test -d " .. repos[i].dir .. repos[i].name) == 0 then
             print("Warning: " .. repos[i].dir .. repos[i].name .. " already exists. Skipping.")
