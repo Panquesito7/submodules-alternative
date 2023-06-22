@@ -17,9 +17,7 @@
 -- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 --
 
---package.path = package.path .. ";../?.lua"
 local data = require(arg[1])
-
 local repos = data.repos
 local check_variables = require("check-variables").check_variables
 
@@ -45,7 +43,7 @@ local function clone_repos()
         if repos[i].clone_modules == true or repos[i].clone_modules == nil then
             os.execute("git clone --recursive " .. repos[i].url .. " " .. repos[i].dir .. repos[i].name)
         elseif repos[i].clone_modules == false then
-            --os.execute("git clone " .. repos[i].url .. " " .. repos[i].dir .. repos[i].name)
+            os.execute("git clone " .. repos[i].url .. " " .. repos[i].dir .. repos[i].name)
         end
 
         ::continue::
