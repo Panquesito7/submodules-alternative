@@ -43,7 +43,7 @@ local function clone_repos()
         -- Include only the repository owner and name (e.g.: panqkart/panqkart).
         local owner, repo = repos[i].url:match("https://github.com/(.-)/(.-)$")
 
-        -- Remove `.git` from `owner`.
+        -- Remove `.git` from `repo`.
         repo = repo:gsub(".git", "")
 
         -- Obtain the default branch name from the given URL by fetching the GitHub API.
@@ -56,7 +56,8 @@ local function clone_repos()
             os.exit(1)
         end
 
-        print(branch)
+        -- Remove endline from `branch`. This is causing the subtree command not to squash everything.
+        branch = branch:gsub("\n", "")
 
         -- Use `git subtree` to avoid the repo being converted to a submodule.
         os.execute("git subtree add --prefix " .. repos[i].dir .. repos[i].name .. " " .. repos[i].url .. " " .. branch .. " --squash")
