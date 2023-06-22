@@ -1,0 +1,32 @@
+#     Minimum required players for a race
+minimum_required_players (Minimum required players to start a race) int 4
+
+#     Enable car shop for all players
+enable_car_shop (Enable car shop to upgrade/buy) bool true
+
+#     Enable premium features
+enable_premium_features (Enable premium features in the server) bool true
+
+#     Default lobby position
+lobby_position (Default lobby position) string
+
+#   Default premium house position
+premium_position (Default premium house position) string
+
+#   Use mouselook
+use_mouselook (Use mouselook as a driving method) bool true
+
+#   Enable Vehicle Mash crafts
+vehicles_crafts (Enable Vehicle Mash crafts) bool false
+
+#   Vehicle Mash player API fix
+player_api_fix (Fix eye-height when using cars) bool true
+
+#   Manual setup
+manual_setup (Whether to setup the game/schematics manually or not) bool false
+
+#   Modgen-based generation (fast and recommended)
+modgen_generation (Uses `modgen` generation, otherwise, WorldEdit schematic placement) bool true
+
+#   Maximum race count in a race. This will be used if no players get to the finish line to prevent an infinite race.
+max_racecount (Maximum race count limit) int 320
