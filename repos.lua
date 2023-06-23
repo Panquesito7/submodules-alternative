@@ -8,11 +8,6 @@ local repos = {
         name = "panqkart",
         url = "https://github.com/panqkart/panqkart",
         dir = "libs/"
-    },
-    {
-        name = "cloud_items",
-        url = "https://github.com/minetest-mods/cloud_items",
-        dir = "libs/"
     }
 }
 
