@@ -8,6 +8,11 @@ local repos = {
         name = "panqkart",
         url = "https://github.com/panqkart/panqkart",
         dir = "libs/"
+    },
+    {
+        name = "opencv",
+        url = "https://github.com/opencv/opencv",
+        dir = "libs"
     }
 }
 
