@@ -1,4 +1,4 @@
-name: "Add/update repositories (with Submodules Alternative)"
+name: "Submodules Alternative"
 description: "Adds/updates all repositories added by the Submodules Alternative workflow."
 author: "Panquesito7"
 inputs:
