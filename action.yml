@@ -1,0 +1,109 @@
+name: "Add/update repositories (with Submodules Alternative)"
+description: "Adds/updates all repositories added by the Submodules Alternative workflow."
+author: "Panquesito7"
+inputs:
+  repos_filename:
+    description: "The filename used to obtain the repository data (no file format is required)."
+    required: true
+    default: "repos"
+  use_pr:
+    description: "Whether to add/update modules via PR or direct push."
+    required: true
+    default: "true"
+  branch_name:
+    description: "The name of the branch to push to (only if `use_pr` is enabled)."
+    required: false
+    default: "repo-update"
+  commit_message:
+    description: "The commit and PR message to use when adding/updating the repositories."
+    required: false
+    default: "Add/update repositories"
+  add_repos:
+    description: "Runs the `fetch-repos` script if enabled to clone all the repositories."
+    required: true
+    default: "false"
+  update_repos:
+    description: "Whether to update the repositories or not."
+    required: true
+    default: "true"
+  squash_commits:
+    description: "Whether to squash all commits into one or not."
+    required: false
+    default: "false"
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Git configurations
+      shell: bash
+      run: |
+        git config --global user.name github-actions[bot]
+        git config --global user.email 'github-actions@users.noreply.github.com'
+    - name: Change to the correct branch
+      shell: bash
+      run: |
+        if git ls-remote --heads origin ${{ inputs.branch_name }} | grep -q ${{ inputs.branch_name }}; then
+          git checkout ${{ inputs.branch_name }}
+        else
+          git checkout -b ${{ inputs.branch_name }}
+        fi
+    - name: Update the repos file
+      shell: bash
+      run: |
+        rm ${{ inputs.repos_filename }}.lua || true
+
+        default_branch=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
+        wget https://raw.githubusercontent.com/${{ github.repository }}/${default_branch}/${{ inputs.repos_filename }}.lua
+
+        # If the file is different, commit. If not, don't commit.
+        if [[ $(git diff --name-only) ]]; then
+          git add ${{ inputs.repos_filename }}.lua
+          git commit -m 'Update repos file'
+        fi
+    - name: Setup Lua
+      uses: xpol/setup-lua@master
+      with:
+        lua-version: "5.3.3"
+    - name: Clone repositories
+      shell: bash
+      run: |
+        if [[ ${{ inputs.add_repos }} == true ]]; then
+          lua fetch-repos.lua ${{ inputs.repos_filename }}
+        fi
+    - name: Update repositories
+      shell: bash
+      run: |
+        if [[ ${{ inputs.update_repos }} == true ]]; then
+          lua update-repos.lua ${{ inputs.repos_filename }}
+        fi
+    - name: Push changes and create PR
+      shell: bash
+      run: |
+        count=$(git log --branches --not --remotes --oneline | wc -l)
+        count=$((count / 2)) # Divide by 2 because each repository addition contains 2 commits.
+
+        if [[ $(gh pr list --state open --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} | wc -l) -gt 0 ]]; then
+          count=$((count + 1))
+        fi
+
+        if [[ $(git diff --name-only) ]]; then
+          count=$((count + 1))
+        fi
+
+        if [[ ${{ inputs.use_pr }} == true ]]; then
+          if [[ $(git log --branches --not --remotes) ]] && [[ ${{ inputs.squash_commits }} == true ]]; then
+            git reset --soft HEAD~$count
+            git commit -m '${{ inputs.commit_message }}'
+          fi
+
+          git push origin ${{ inputs.branch_name }}:${{ inputs.branch_name }}
+          gh pr create --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} --title '${{ inputs.commit_message }}' --body 'Repositories were added or updated using the Submodules Alternative tool.' || true
+        else
+            if [[ $(git log --branches --not --remotes) ]] && [[ ${{ inputs.squash_commits }} == true ]]; then
+              git reset --soft HEAD~$count
+              git commit -m '${{ inputs.commit_message }}'
+            fi
+
+            git push
+        fi
+      env:
+        GH_TOKEN: ${{ github.token }}
