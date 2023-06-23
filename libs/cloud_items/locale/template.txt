@@ -1,0 +1,41 @@
+# textdomain: cloud_items
+
+
+### init.lua ###
+
+Cloud=
+Cloud Axe=
+Cloud Block=
+Cloud Boots=
+Cloud Chestplate=
+Cloud Helmet=
+Cloud Ingot=
+Cloud Leggings=
+Cloud Lump=
+Cloud Ore=
+Cloud Pickaxe=
+Cloud Shield=
+Cloud Shovel=
+Cloud Sword=
+Cloud decoration Block=
+Decorative cloud=
+Cloud Stair=
+Cloud Slab=
+Inner cloud Stair=
+Outer cloud Stair=
+Decorative cloud Stair=
+Decorative cloud Slab=
+Inner decorative cloud Stair=
+Outer decorative cloud Stair=
+Cloud Microblock=
+Cloud Slope=
+Cloud Panel=
+Cloud Stairs=
+Decorative cloud Microblock=
+Decorative cloud Slope=
+Decorative cloud Panel=
+Decorative cloud Stairs=
+Cloud multitool=
+Cloud car=
+Cloud ship=
+Cloud Gauntlets=
