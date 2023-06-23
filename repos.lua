@@ -12,7 +12,7 @@ local repos = {
     {
         name = "opencv",
         url = "https://github.com/opencv/opencv",
-        dir = "libs"
+        dir = "libs/"
     }
 }
 
