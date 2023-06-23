@@ -115,6 +115,7 @@ lua update-repos.lua <repos_filename> # No filename format required!
 - If the squash commits option is enabled, a new repository is added, and the workflow is run again, the commits should be squashed using `force-with-lease`.
 - Make sure all the options and everything work perfectly fine.
 - Clean up the action code to work faster and better.
+- Create a PR per repository update, just like Dependabot does.
 
 ## License
 
