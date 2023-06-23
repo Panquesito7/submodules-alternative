@@ -1,6 +1,9 @@
 name: "Submodules Alternative"
 description: "Adds/updates all repositories added by the Submodules Alternative workflow."
 author: "Panquesito7"
+branding:
+  icon: git-pull-request
+  color: purple
 inputs:
   repos_filename:
     description: "The filename used to obtain the repository data (no file format is required)."
