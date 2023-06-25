@@ -86,6 +86,9 @@ For more information about Cron, you can check [CronHub](https://crontab.cronhub
 > machine in case you do not have it installed.
 >
 > Download: <https://www.lua.org/download.html>
+>
+> **Both `fetch-repos.lua` and `update-repos.lua` require\
+> `check-variables.lua` to make sure everything is set properly.**
 
 ```bash
 lua fetch-repos.lua <repos_filename> # No filename format required!
@@ -97,7 +100,7 @@ lua fetch-repos.lua <repos_filename> # No filename format required!
 git push
 ```
 
-3. Done! All of your repositories are now available in your project and can be updated later on.
+3. Done! All of your repositories are now available in your project and can be updated later on. 🎉
 
 If you've updated your repositories list, you can always run the script again and it'll clone the new repositories.
 
