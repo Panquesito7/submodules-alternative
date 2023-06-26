@@ -28,9 +28,6 @@ local check_variables = require("check-variables").check_variables
 local function clone_repos()
     local branch = ""
     for i = 1, #repos do
-        -- Make sure all of the variables are set.
-        check_variables(repos, i)
-
         -- Create the given directory if it does not exist.
         os.execute("mkdir -p " .. repos[i].dir)
 
@@ -39,6 +36,9 @@ local function clone_repos()
             print("Warning: " .. repos[i].dir .. repos[i].name .. " already exists. Skipping.")
             goto continue
         end
+
+        -- Make sure all of the variables are set.
+        check_variables(repos, i)
 
         -- Get the current VCS that is being used.
         local vcs = repos[i].url:match("https://(%w+).%w+")
