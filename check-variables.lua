@@ -37,6 +37,10 @@ local function check_variables(repo, i)
         print("Error: `dir` is not set for repository " .. i)
         os.exit(1)
     end
+
+    if repo[i].def_branch == nil then
+        print("Warning: default branch not specified for `" .. repo[i].name .. "`. Attempting to obtain the default branch using the API.")
+    end
 end
 
 return {
