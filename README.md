@@ -21,7 +21,8 @@ local repos = {
     {
         name = "opencv",
         url = "https://github.com/opencv/opencv",
-        dir = "libs/"
+        dir = "libs/",
+        def_branch = "master"
     },
     {
         name = "texto",
@@ -62,7 +63,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0 # This pulls changes before doing any changes
-      - uses: Panquesito7/submodules-alternative@v1.1.0
+      - uses: Panquesito7/submodules-alternative@v1.2.0
         with:
           repos_filename: repos    # In case your file is named `repos.lua`, you can leave it as `repos`.
           use_pr: true             # Whether to create a pull request when updating/adding the repositories.
