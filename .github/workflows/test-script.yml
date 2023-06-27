@@ -7,11 +7,11 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - uses: Panquesito7/submodules-alternative@v1
+      - uses: Panquesito7/submodules-alternative@dev
         with:
           repos_filename: repos-test
           use_pr: true
           branch_name: submodule-update
-          add_repos: true
+          add_repos: false
           update_repos: true
-          squash_commits: true
+          squash_commits: false
