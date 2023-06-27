@@ -112,7 +112,7 @@ runs:
 
         if [[ ${{ inputs.update_repos }} == true ]]; then
           git add -A -- ':!fetch-repos.lua' ':!update-repos.lua'
-          git commit -m '${{ inputs.commit_message }}'
+          git commit -m '${{ inputs.commit_message }}' || true
         fi
 
         # Removes the `fetch-repos.lua` script from the repository, as it is not needed.
