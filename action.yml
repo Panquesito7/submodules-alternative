@@ -52,15 +52,16 @@ runs:
     - name: Update the repositories file
       shell: bash
       run: |
-        git rm ${{ inputs.repos_filename }}.lua || true
+        if [[ $(git diff --name-only origin/${GITHUB_REF##*/} ${{ inputs.repos_filename }}) ]]; then
+          git rm ${{ inputs.repos_filename }}.lua || true
 
-        default_branch=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
-        wget https://raw.githubusercontent.com/${{ github.repository }}/${default_branch}/${{ inputs.repos_filename }}.lua
+          default_branch=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
+          wget https://raw.githubusercontent.com/${{ github.repository }}/${default_branch}/${{ inputs.repos_filename }}.lua
 
-        # If the file is different, commit. If not, don't commit.
-        if [[ $(git diff --name-only) ]]; then
-          git add ${{ inputs.repos_filename }}.lua
-          git commit -m 'Update repositories file'
+          if [[ $(git diff --name-only) ]]; then
+            git add ${{ inputs.repos_filename }}.lua
+            git commit -m 'Update repositories file'
+          fi
         fi
     - name: Setup Lua
       uses: xpol/setup-lua@master
@@ -77,7 +78,6 @@ runs:
             git commit -m "Get the fetch-repos script"
           fi
 
-          git status
           lua fetch-repos.lua ${{ inputs.repos_filename }}
         fi
     - name: Update repositories
