@@ -49,18 +49,19 @@ runs:
         else
           git checkout -b ${{ inputs.branch_name }}
         fi
-    - name: Update the repos file
+    - name: Update the repositories file
       shell: bash
       run: |
-        rm ${{ inputs.repos_filename }}.lua || true
+        if [[ $(git diff --name-only origin/${GITHUB_REF##*/} ${{ inputs.repos_filename }}) ]]; then
+          git rm ${{ inputs.repos_filename }}.lua || true
 
-        default_branch=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
-        wget https://raw.githubusercontent.com/${{ github.repository }}/${default_branch}/${{ inputs.repos_filename }}.lua
+          default_branch=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
+          wget https://raw.githubusercontent.com/${{ github.repository }}/${default_branch}/${{ inputs.repos_filename }}.lua
 
-        # If the file is different, commit. If not, don't commit.
-        if [[ $(git diff --name-only) ]]; then
-          git add ${{ inputs.repos_filename }}.lua
-          git commit -m 'Update repos file'
+          if [[ $(git diff --name-only) ]]; then
+            git add ${{ inputs.repos_filename }}.lua
+            git commit -m 'Update repositories file'
+          fi
         fi
     - name: Setup Lua
       uses: xpol/setup-lua@master
@@ -70,43 +71,59 @@ runs:
       shell: bash
       run: |
         if [[ ${{ inputs.add_repos }} == true ]]; then
+          # Committing is necessary if we want to revert the changes and fetching
+          # the script at the same time, as otherwise, the script below would fail.
+          if [[ ! -f fetch-repos.lua ]]; then
+            wget https://raw.githubusercontent.com/Panquesito7/submodules-alternative/main/fetch-repos.lua
+            git add fetch-repos.lua
+            git commit -m "Get the fetch-repos script"
+          fi
+
           lua fetch-repos.lua ${{ inputs.repos_filename }}
         fi
     - name: Update repositories
       shell: bash
       run: |
         if [[ ${{ inputs.update_repos }} == true ]]; then
+          if [[ ! -f update-repos.lua ]]; then
+            wget https://raw.githubusercontent.com/Panquesito7/submodules-alternative/main/update-repos.lua
+          fi
           lua update-repos.lua ${{ inputs.repos_filename }}
         fi
     - name: Push changes and create PR
       shell: bash
       run: |
-        count=$(git log --branches --not --remotes --oneline | wc -l)
-        count=$((count / 2)) # Divide by 2 because each repository addition contains 2 commits.
+        if [[ ${{ inputs.add_repos }} == true ]]; then
+          count=$(git log --branches --not --remotes --oneline | wc -l)
+          count=$((count / 2)) # Divide by 2 because each repository addition contains 2 commits.
 
-        if [[ $(gh pr list --state open --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} | wc -l) -gt 0 ]]; then
-          count=$((count + 1))
-        fi
+          if [[ $(gh pr list --state open --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} | wc -l) -gt 0 ]]; then
+            count=$((count + 1))
+          fi
 
-        if [[ $(git diff --name-only) ]]; then
-          count=$((count + 1))
-        fi
+          if [[ $(git diff --name-only) ]]; then
+            count=$((count + 1))
+          fi
 
-        if [[ ${{ inputs.use_pr }} == true ]]; then
           if [[ $(git log --branches --not --remotes) ]] && [[ ${{ inputs.squash_commits }} == true ]]; then
             git reset --soft HEAD~$count
             git commit -m '${{ inputs.commit_message }}'
           fi
+        fi
 
-          git push origin ${{ inputs.branch_name }}:${{ inputs.branch_name }}
+        if [[ ${{ inputs.update_repos }} == true ]]; then
+          git add -A -- ':!fetch-repos.lua' ':!update-repos.lua'
+          git commit -m '${{ inputs.commit_message }}' || true
+        fi
+
+        # Removes the `fetch-repos.lua` script from the repository, as it is not needed.
+        git revert $(git log --branches --not --remotes --grep 'Get the fetch-repos script' --oneline | cut -d' ' -f1) --no-edit || true
+
+        if [[ ${{ inputs.use_pr }} == true ]]; then
+          git push origin ${{ inputs.branch_name }}:${{ inputs.branch_name }} || true
           gh pr create --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} --title '${{ inputs.commit_message }}' --body 'Repositories were added or updated using the Submodules Alternative tool.' || true
         else
-            if [[ $(git log --branches --not --remotes) ]] && [[ ${{ inputs.squash_commits }} == true ]]; then
-              git reset --soft HEAD~$count
-              git commit -m '${{ inputs.commit_message }}'
-            fi
-
-            git push
+          git push || true
         fi
       env:
         GH_TOKEN: ${{ github.token }}
