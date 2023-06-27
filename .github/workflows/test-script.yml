@@ -12,6 +12,6 @@ jobs:
           repos_filename: repos-test
           use_pr: true
           branch_name: submodule-update
-          add_repos: false
+          add_repos: true
           update_repos: true
           squash_commits: false
