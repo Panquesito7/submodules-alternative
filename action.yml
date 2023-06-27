@@ -77,6 +77,7 @@ runs:
             git commit -m "Get the fetch-repos script"
           fi
 
+          git status
           lua fetch-repos.lua ${{ inputs.repos_filename }}
         fi
     - name: Update repositories
@@ -112,12 +113,10 @@ runs:
         if [[ ${{ inputs.update_repos }} == true ]]; then
           git add -A -- ':!fetch-repos.lua' ':!update-repos.lua'
           git commit -m '${{ inputs.commit_message }}'
-
-          git rm update-repos.lua
         fi
 
         # Removes the `fetch-repos.lua` script from the repository, as it is not needed.
-        git revert $(git log --branches --not --remotes --grep 'Get the fetch-repos script' --oneline | cut -d' ' -f1) --no-edit
+        git revert $(git log --branches --not --remotes --grep 'Get the fetch-repos script' --oneline | cut -d' ' -f1) --no-edit || true
 
         if [[ ${{ inputs.use_pr }} == true ]]; then
           git push origin ${{ inputs.branch_name }}:${{ inputs.branch_name }} || true
