@@ -84,6 +84,7 @@ runs:
         if [[ ${{ inputs.update_repos }} == true ]]; then
           if [[ ! -f update-repos.lua ]]; then
             wget https://raw.githubusercontent.com/Panquesito7/submodules-alternative/main/update-repos.lua
+          fi
         fi
     - name: Clone repositories
       shell: bash
