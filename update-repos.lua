@@ -44,7 +44,7 @@ local function update_repos()
         ::continue::
     end
 
-    os.execute("git commit -m " .. args[2])
+    os.execute("git commit -m " .. arg[2])
 end
 
 -- Update all repositories.
