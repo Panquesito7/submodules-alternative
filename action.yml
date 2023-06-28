@@ -52,7 +52,7 @@ runs:
     - name: Update the repositories file
       shell: bash
       run: |
-        if [[ $(git diff --name-only origin/${GITHUB_REF##*/} ${{ inputs.repos_filename }}) ]]; then
+        if [[ $(git diff --name-only origin/${GITHUB_REF##*/} ${{ inputs.repos_filename }}.lua) ]]; then
           git rm ${{ inputs.repos_filename }}.lua || true
 
           default_branch=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
@@ -67,9 +67,10 @@ runs:
       uses: xpol/setup-lua@master
       with:
         lua-version: "5.3.3"
-    - name: Clone repositories
+    - name: Fetch scripts
       shell: bash
       run: |
+        wget https://raw.githubusercontent.com/Panquesito7/submodules-alternative/main/check-variables.lua
         if [[ ${{ inputs.add_repos }} == true ]]; then
           # Committing is necessary if we want to revert the changes and fetching
           # the script at the same time, as otherwise, the script below would fail.
@@ -78,16 +79,22 @@ runs:
             git add fetch-repos.lua
             git commit -m "Get the fetch-repos script"
           fi
+        fi
 
+        if [[ ${{ inputs.update_repos }} == true ]]; then
+          if [[ ! -f update-repos.lua ]]; then
+            wget https://raw.githubusercontent.com/Panquesito7/submodules-alternative/main/update-repos.lua
+        fi
+    - name: Clone repositories
+      shell: bash
+      run: |
+        if [[ ${{ inputs.add_repos }} == true ]]; then
           lua fetch-repos.lua ${{ inputs.repos_filename }}
         fi
     - name: Update repositories
       shell: bash
       run: |
         if [[ ${{ inputs.update_repos }} == true ]]; then
-          if [[ ! -f update-repos.lua ]]; then
-            wget https://raw.githubusercontent.com/Panquesito7/submodules-alternative/main/update-repos.lua
-          fi
           lua update-repos.lua ${{ inputs.repos_filename }}
         fi
     - name: Push changes and create PR
