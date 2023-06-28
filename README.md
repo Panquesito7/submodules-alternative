@@ -9,6 +9,7 @@ An easy-to-use Git (Sub)modules alternative to make the cloning process easier.
 - Lightweight and documented codebase in [Lua](https://www.lua.org/) v5.3.3.
 - Git Submodules can sometimes be messy or confusing, which this tool aims to solve.
 <!-- - Easily specify which files are ignored at the moment of updating the repositories. This is very useful if you want to modify a repository/submodule. -->
+- Lets you choose the desired branch of the repository, unlike Git Submodules that automatically chooses the default branch.
 
 ## Usage
 
@@ -63,15 +64,16 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0 # This pulls changes before doing any changes
-      - uses: Panquesito7/submodules-alternative@v1.3.1
+      - uses: Panquesito7/submodules-alternative@v1.4.0
         with:
-          repos_filename: repos    # In case your file is named `repos.lua`, you can leave it as `repos`.
-          use_pr: true             # Whether to create a pull request when updating/adding the repositories.
-          branch_name: repo-update # The branch name to use (only if `use_pr` is enabled).
-          commit_message: "Update" # The commit message used when pushing (optional; basic message is used).
-          add_repos: false         # If enabled, this will clone all the repositories listed in your repos file.
-          update_repos: true       # When enabled, this will attempt to update all the repositories.
-          squash_commits: false    # Whether to squash all commits or not (experimental). USE ONLY ON `use_pr` FOR SAFETY.
+          repos_filename: repos                       # In case your file is named `repos.lua`, you can leave it as `repos`.
+          use_pr: true                                # Whether to create a pull request when updating/adding the repositories.
+          branch_name: repo-update                    # The branch name to use (only if `use_pr` is enabled).
+          commit_message: "Update"                    # Commit message used when adding new repositories.
+          commit_message_update: "Bump repositories"  # Commit message used when updating all the repositories.
+          add_repos: false                            # If enabled, this will clone all the repositories listed in your repos file.
+          update_repos: true                          # When enabled, this will attempt to update all the repositories.
+          squash_commits: false                       # Whether to squash all commits or not (experimental). USE ONLY ON `use_pr` FOR SAFETY.
 ```
 
 You can also configure to run the workflow manually by using `workflow_dispatch` instead of `schedule`.\
@@ -110,9 +112,14 @@ If you've updated your repositories list, you can always run the script again an
 By using GitHub Actions, the repositories will be updated automatically.\
 If you wish to do that manually, you can run the following script.
 
+**Remember to use `""` around the commit message!**
+
 ```bash
-lua update-repos.lua <repos_filename> # No filename format required!
+lua update-repos.lua <repos_filename> <commit_message> # No filename format required!
 ```
+
+After running the script, you can push changes to the desired branch.\
+The script already takes care of committing everything.
 
 ## To-do
 

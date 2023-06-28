@@ -38,10 +38,13 @@ local function update_repos()
 
         -- Update the repository with the given options.
         os.execute("cd " .. repos[i].dir .. repos[i].name .. " && git pull")
-        os.execute("cd ..") -- Go back
+        os.execute("git add .")
+        os.execute("cd ..") -- Go back.
 
         ::continue::
     end
+
+    os.execute("git commit -m " .. args[2])
 end
 
 -- Update all repositories.
