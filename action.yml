@@ -38,7 +38,7 @@ inputs:
     required: false
     default: "false"
   one_pr:
-    description: "Creates one single PR for updating all the repositories. This does not apply for the `fetch-repos` script. `squash_commits` must be disabled!"
+    description: "Creates one single PR for updating all the repositories. This does not apply to the `fetch-repos` script. `squash_commits` must be disabled!"
     required: false
     default: "false"
 runs:
@@ -118,15 +118,17 @@ runs:
       shell: bash
       run: |
         # Removes the `fetch-repos.lua` script from the repository, as it is not needed.
-        git revert $(git log --branches --not --remotes --grep 'Get the fetch-repos script' --oneline | cut -d' ' -f1) --no-edit || true
+        if [[ ${{ inputs.add_repos }} == true ]]; then
+          git revert $(git log --branches --not --remotes --grep 'Get the fetch-repos script' --oneline | cut -d' ' -f1) --no-edit || true
+        fi
 
-        if [[ $ {{ inputs.use_pr }} == true ]]; then
-          if [[ $ {{ inputs.one_pr }} == true ]]; then
+        if [[ ${{ inputs.use_pr }} == true ]]; then
+          if [[ ${{ inputs.one_pr }} == true ]]; then
             git push origin ${{ inputs.branch_name }}:${{ inputs.branch_name }} || true
             gh pr create --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} --title '${{ inputs.commit_message }}' --body 'Repositories were added or updated using the Submodules Alternative tool.' || true
           else
             # The One PR option is not available when adding the repositories.
-            if [[ $ {{ inputs.add_repos }} == true ]]; then
+            if [[ ${{ inputs.add_repos }} == true ]]; then
               git checkout ${{ inputs.branch_name }} || true
 
               git push origin ${{ inputs.branch_name }}:${{ inputs.branch_name }} || true
