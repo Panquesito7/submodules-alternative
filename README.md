@@ -9,7 +9,7 @@ An easy-to-use Git (Sub)modules alternative to make the cloning process easier.
 - Lightweight and documented codebase in [Lua](https://www.lua.org/) v5.3.3.
 - Git Submodules can sometimes be messy or confusing, which this tool aims to solve.
 <!-- - Easily specify which files are ignored at the moment of updating the repositories. This is very useful if you want to modify a repository/submodule. -->
-- Lets you choose the desired branch of the repository, unlike Git Submodules that automatically chooses the default branch.
+- Lets you choose the desired branch of the repository, unlike Git Submodules which automatically chooses the default branch.
 
 ## Usage
 
@@ -64,7 +64,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0 # This pulls changes before doing any changes
-      - uses: Panquesito7/submodules-alternative@v1.4.0
+      - uses: Panquesito7/submodules-alternative@v1.4.1
         with:
           repos_filename: repos                       # In case your file is named `repos.lua`, you can leave it as `repos`.
           use_pr: true                                # Whether to create a pull request when updating/adding the repositories.
