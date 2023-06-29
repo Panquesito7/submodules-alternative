@@ -10,7 +10,7 @@ inputs:
     required: true
     default: "repos"
   use_pr:
-    description: "Whether to add/update modules via PR or direct push."
+    description: "Whether to add/update repositories via a PR or direct push."
     required: true
     default: "true"
   branch_name:
@@ -34,12 +34,23 @@ inputs:
     required: true
     default: "true"
   squash_commits:
-    description: "Whether to squash all commits into one or not (experimental)."
+    description: "Whether to squash all commits into one or not."
+    required: false
+    default: "false"
+  one_pr:
+    description: "Creates one single PR for updating all the repositories. This does not apply for the `fetch-repos` script. `squash_commits` must be disabled!"
     required: false
     default: "false"
 runs:
   using: "composite"
   steps:
+    - name: Make sure the configuration is valid
+      shell: bash
+      run: |
+        if [[ ${{ inputs.add_repos }} == false ]] && [[ ${{ inputs.update_repos }} == false ]]; then
+          echo "Both 'add_repos' and 'update_repos' are disabled. Please enable at least one of them."
+          exit 1
+        fi
     - name: Setup Git configurations
       shell: bash
       run: |
@@ -74,7 +85,8 @@ runs:
     - name: Fetch scripts
       shell: bash
       run: |
-        wget https://raw.githubusercontent.com/Panquesito7/submodules-alternative/main/check-variables.lua
+        wget https://raw.githubusercontent.com/Panquesito7/submodules-alternative/main/helper-functions.lua
+
         if [[ ${{ inputs.add_repos }} == true ]]; then
           # Committing is necessary if we want to revert the changes and fetching
           # the script at the same time, as otherwise, the script below would fail.
@@ -94,43 +106,42 @@ runs:
       shell: bash
       run: |
         if [[ ${{ inputs.add_repos }} == true ]]; then
-          lua fetch-repos.lua ${{ inputs.repos_filename }}
+          lua fetch-repos.lua ${{ inputs.repos_filename }} ${{ inputs.squash_commits }}
         fi
     - name: Update repositories
       shell: bash
       run: |
         if [[ ${{ inputs.update_repos }} == true ]]; then
-          lua update-repos.lua ${{ inputs.repos_filename }} ${{ inputs.commit_message_update }}
+          lua update-repos.lua ${{ inputs.repos_filename }} ${{ inputs.commit_message_update }} ${{ inputs.squash_commits }} ${{ inputs.one_pr }}
         fi
     - name: Push changes and create PR
       shell: bash
       run: |
-        if [[ ${{ inputs.add_repos }} == true ]]; then
-          count=$(git log --branches --not --remotes --oneline | wc -l)
-          count=$((count / 2)) # Divide by 2 because each repository addition contains 2 commits.
-
-          if [[ $(gh pr list --state open --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} | wc -l) -gt 0 ]]; then
-            count=$((count + 1))
-          fi
-
-          if [[ $(git diff --name-only) ]]; then
-            count=$((count + 1))
-          fi
-
-          if [[ $(git log --branches --not --remotes) ]] && [[ ${{ inputs.squash_commits }} == true ]]; then
-            git reset --soft HEAD~$count
-            git commit -m '${{ inputs.commit_message }}'
-          fi
-        fi
-
         # Removes the `fetch-repos.lua` script from the repository, as it is not needed.
         git revert $(git log --branches --not --remotes --grep 'Get the fetch-repos script' --oneline | cut -d' ' -f1) --no-edit || true
 
-        if [[ ${{ inputs.use_pr }} == true ]]; then
-          git push origin ${{ inputs.branch_name }}:${{ inputs.branch_name }} || true
-          gh pr create --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} --title '${{ inputs.commit_message }}' --body 'Repositories were added or updated using the Submodules Alternative tool.' || true
+        if [[ $ {{ inputs.use_pr }} == true ]]; then
+          if [[ $ {{ inputs.one_pr }} == true ]]; then
+            git push origin ${{ inputs.branch_name }}:${{ inputs.branch_name }} || true
+            gh pr create --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} --title '${{ inputs.commit_message }}' --body 'Repositories were added or updated using the Submodules Alternative tool.' || true
+          else
+            # The One PR option is not available when adding the repositories.
+            if [[ $ {{ inputs.add_repos }} == true ]]; then
+              git checkout ${{ inputs.branch_name }} || true
+
+              git push origin ${{ inputs.branch_name }}:${{ inputs.branch_name }} || true
+              gh pr create --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} --title '${{ inputs.commit_message }}' --body 'Repositories were added or updated using the Submodules Alternative tool.' || true
+            else # The `add_repos` option is disabled.
+              branches=$(lua -e 'local repos = require(arg[0]).repos; dofile("helper-functions.lua"); get_repo_branches(repos)' $ {{ inputs.repos_filename }})
+
+              for branch in ${branches[@]}; do
+                repo_name=${branch%-update}
+                gh pr create --base ${GITHUB_REF##*/} --head $branch --title 'Bump $repo_name to its latest commit' --body 'The repository $repo_name was updated to its latest commit.' || true
+              done
+            fi
+          fi
         else
-          git push || true
+          git push origin || true
         fi
       env:
         GH_TOKEN: ${{ github.token }}

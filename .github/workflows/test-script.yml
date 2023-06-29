@@ -15,3 +15,4 @@ jobs:
           add_repos: true
           update_repos: true
           squash_commits: false
+          one_pr: false

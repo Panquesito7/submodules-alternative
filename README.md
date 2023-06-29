@@ -15,7 +15,8 @@ An easy-to-use Git (Sub)modules alternative to make the cloning process easier.
 
 1. Create a new file named `repos.lua` (or as you desire) with all your selected repositories ([template](https://github.com/Panquesito7/submodules-alternative/blob/main/repos-template.lua) file).
 
-Your `repos.lua` file should look similar to the following.
+Your `repos.lua` file should look similar to the following.\
+**It is recommended to not include `.git` at the end of URLs for various settings on the script.**
 
 ```lua
 local repos = {
@@ -73,7 +74,7 @@ jobs:
           commit_message_update: "Bump repositories"  # Commit message used when updating all the repositories.
           add_repos: false                            # If enabled, this will clone all the repositories listed in your repos file.
           update_repos: true                          # When enabled, this will attempt to update all the repositories.
-          squash_commits: false                       # Whether to squash all commits or not (experimental). USE ONLY ON `use_pr` FOR SAFETY.
+          squash_commits: false                       # Whether to squash all commits or not on every repository update/addition.
 ```
 
 You can also configure to run the workflow manually by using `workflow_dispatch` instead of `schedule`.\
@@ -91,10 +92,10 @@ For more information about Cron, you can check [CronHub](https://crontab.cronhub
 > Download: <https://www.lua.org/download.html>
 >
 > **Both `fetch-repos.lua` and `update-repos.lua` require\
-> `check-variables.lua` to make sure everything is set properly.**
+> `helper-functions.lua` for extra functions and safety checks.**
 
 ```bash
-lua fetch-repos.lua <repos_filename> # No filename format required!
+lua fetch-repos.lua <repos_filename> <squash_commits> # No filename format required!
 ```
 
 2. Once done, you can push changes. Committing is already done by the script.
@@ -115,7 +116,7 @@ If you wish to do that manually, you can run the following script.
 **Remember to use `""` around the commit message!**
 
 ```bash
-lua update-repos.lua <repos_filename> <commit_message> # No filename format required!
+lua update-repos.lua <repos_filename> <commit_message> <squash_commits> # No filename format required!
 ```
 
 After running the script, you can push changes to the desired branch.\
