@@ -75,7 +75,7 @@ local function update_repos()
         ::continue::
     end
 
-    if squash_commits == true and one_pr == true then
+    if squash_commits == true then
         os.execute("git commit -m " .. arg[2])
     end
 end
