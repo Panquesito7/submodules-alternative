@@ -19,7 +19,23 @@
 
 local data = require(arg[1])
 local repos = data.repos
-local check_variables = require("check-variables").check_variables
+local helper_functions = require("helper-functions")
+
+-- Squash commits option.
+local squash_commits
+if arg[3] ~= nil then
+    squash_commits = arg[3]
+else
+    squash_commits = false
+end
+
+-- One PR option.
+local one_pr
+if arg[4] ~= nil then
+    one_pr = arg[4]
+else
+    one_pr = false
+end
 
 --- @brief Updates all the repositories by
 --- running `git pull` on each repository.
@@ -28,7 +44,7 @@ local check_variables = require("check-variables").check_variables
 local function update_repos()
     for i = 1, #repos do
         -- Make sure all of the variables are set.
-        check_variables(repos, i)
+        helper_functions.check_variables(repos, i)
 
         -- Make sure the repository is cloned already.
         if os.execute("test -d " .. repos[i].dir .. repos[i].name) == nil then
@@ -36,12 +52,32 @@ local function update_repos()
             goto continue
         end
 
-        -- Update the repository with the given options.
-        os.execute("cd " .. repos[i].dir .. repos[i].name .. " && git pull && git add .")
+        -- Attempt to get the default branch.
+        local branch = helper_functions.get_def_branch(repos, i)
+
+        if branch == nil then
+            goto continue
+        end
+
+        os.execute("git remote add -f " .. repos[i].name .. " " .. repos[i].url)
+        os.execute("git merge -s subtree --squash -Xsubtree=" .. repos[i].dir .. repos[i].name .. " " .. repos[i].name .. "/" .. branch)
+        os.execute("git remote remove " .. repos[i].name)
+
+        if one_pr == false then
+            os.execute("git checkout -b " .. repos[i].name .. "-update")
+            os.execute("git push origin:" .. repos[i].name .. "-update:" .. repos[i].name .. "-update")
+        end
+
+        if squash_commits == false then
+            os.execute("git commit -m \"Bump " .. repos[i].name .. " to its latest commit\"")
+        end
+
         ::continue::
     end
 
-    os.execute("git commit -m " .. arg[2])
+    if squash_commits == true and one_pr == true then
+        os.execute("git commit -m " .. arg[2])
+    end
 end
 
 -- Update all repositories.

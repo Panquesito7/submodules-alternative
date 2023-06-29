@@ -19,14 +19,22 @@
 
 local data = require(arg[1])
 local repos = data.repos
-local check_variables = require("check-variables").check_variables
+local helper_functions = require("helper-functions")
+
+-- Squash commits option.
+local squash_commits
+if arg[2] ~= nil then
+    squash_commits = arg[2]
+else
+    squash_commits = false
+end
 
 --- @brief Clones all the repositories with the given options.
 --- Submodules will be cloned depending on the desired setting.
 --- This script can be ran multiple times without any issues.
 --- @return nil
 local function clone_repos()
-    local branch = ""
+    local branch
     for i = 1, #repos do
         -- Create the given directory if it does not exist.
         os.execute("mkdir -p " .. repos[i].dir)
@@ -38,91 +46,28 @@ local function clone_repos()
         end
 
         -- Make sure all of the variables are set.
-        check_variables(repos, i)
+        helper_functions.check_variables(repos, i)
 
-        -- Get the current VCS that is being used.
-        local vcs = repos[i].url:match("https://(%w+).%w+")
-        local owner, repo = repos[i].url:match(vcs .. ".%w+/(.+)/(.+)")
+        -- Get the default branch.
+        branch = helper_functions.get_def_branch(repos, i) or ""
 
-        -- Remove `.git` from `repo` if available.
-        repo = repo:gsub(".git", "")
-
-        -- Attempt to obtain the default branch name from the given URL.
-        -- Currently supports: GitLab, GitHub, and BitBucket.
-        local handle
-
-        if vcs == "github" then
-            handle = io.popen("wget -q -O - \"\"https://api.github.com/repos/" .. owner .. "/" .. repo .. "\"\" | jq -r '.default_branch'")
-            if handle then
-                -- Print message and update branch only if default branch not set.
-                if repos[i].def_branch == nil then
-                    branch = handle:read("*a")
-                    handle:close()
-
-                    print("Found branch for `" .. repo .. "` using GitHub API.")
-                else
-                    branch = repos[i].def_branch
-                end
-            else
-                print("Error: Could not obtain the default branch name from the given URL.")
-                os.exit(1)
-            end
-        elseif vcs == "gitlab" then
-            handle = io.popen("wget -q -O - \"\"https://gitlab.com/api/v4/projects/" .. owner .. "%2F" .. repo .. "\"\" | jq -r '.default_branch'")
-            if handle then
-                -- Print message and update branch only if default branch not set.
-                if repos[i].def_branch == nil then
-                    branch = handle:read("*a")
-                    handle:close()
-
-                    print("Found branch for `" .. repo .. "` using GitLab API.")
-                else
-                    branch = repos[i].def_branch
-                end
-            else
-                print("Error: Could not obtain the default branch name from the given URL.")
-                os.exit(1)
-            end
-        elseif vcs == "bitbucket" then
-            handle = io.popen("wget -q -O - \"\"https://api.bitbucket.org/2.0/repositories/" .. owner .. "/" .. repo .. "\"\" | jq -r '.mainbranch.name'")
-            if handle then
-                -- Print message and update branch only if default branch not set.
-                if repos[i].def_branch == nil then
-                    branch = handle:read("*a")
-                    handle:close()
-
-                    print("Found branch for `" .. repo .. "` using BitBucket API.")
-                else
-                    branch = repos[i].def_branch
-                end
-            else
-                print("Error: Could not obtain the default branch name from the given URL.")
-                os.exit(1)
-            end
-        -- Fallback.
-        else
-            print("The default branch could not be found for `" .. repo .. "`. Using provided default branch instead.")
-            if repos[i].def_branch ~= nil then
-                branch = repos[i].def_branch
-                print("Found provided default branch for `" .. repo .. "`.")
-            else
-                print("Could not find provided default branch for `" .. repo .. "`. Skipping.")
-                goto continue
-            end
+        if branch == nil then
+            goto continue
         end
 
-        -- Remove endline from `branch`. This is causing the subtree command not to squash everything.
-        branch = branch:gsub("\n", "")
+        os.execute("git remote add -f " .. repos[i].name .. " " .. repos[i].url)
+        os.execute("git read-tree --prefix " .. repos[i].dir .. repos[i].name .. " -u " .. repos[i].name .. "/" .. branch)
+        os.execute("git remote remove " .. repos[i].name)
 
-        -- Use `git subtree` to avoid the repo being converted to a submodule.
-        os.execute("git subtree add --prefix " .. repos[i].dir .. repos[i].name .. " " .. repos[i].url .. " " .. branch .. " --squash")
-
-        -- Change the commit message to include the repository name, only, if the commit was successful.
-        if os.execute("test -d " .. repos[i].dir .. repos[i].name) then
-            os.execute("git commit --amend -m \"Add " .. repos[i].name .. " repository\"")
+        if squash_commits == false then
+            os.execute("git commit -m \"Add " .. repos[i].name .. ".\"")
         end
 
         ::continue::
+    end
+
+    if squash_commits == true then
+        os.execute("git commit -m \"Add the given repositories.\"")
     end
 end
 
