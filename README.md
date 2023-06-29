@@ -65,7 +65,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0 # This pulls changes before doing any changes
-      - uses: Panquesito7/submodules-alternative@v1.4.1
+      - uses: Panquesito7/submodules-alternative@v1.5.0
         with:
           repos_filename: repos                       # In case your file is named `repos.lua`, you can leave it as `repos`.
           use_pr: true                                # Whether to create a pull request when updating/adding the repositories.
@@ -75,6 +75,7 @@ jobs:
           add_repos: false                            # If enabled, this will clone all the repositories listed in your repos file.
           update_repos: true                          # When enabled, this will attempt to update all the repositories.
           squash_commits: false                       # Whether to squash all commits or not on every repository update/addition.
+          one_pr: false                               # Creates one single PR for everything if enabled. Works only for `update_repos` if disabled.
 ```
 
 You can also configure to run the workflow manually by using `workflow_dispatch` instead of `schedule`.\
