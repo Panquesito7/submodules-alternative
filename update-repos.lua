@@ -31,16 +31,13 @@ local function update_repos()
         check_variables(repos, i)
 
         -- Make sure the repository is cloned already.
-        if os.execute("test -d " .. repos[i].dir .. repos[i].name) ~= 0 then
+        if os.execute("test -d " .. repos[i].dir .. repos[i].name) == nil then
             print("Warning: " .. repos[i].dir .. repos[i].name .. " does not exist. Skipping.")
             goto continue
         end
 
         -- Update the repository with the given options.
-        os.execute("cd " .. repos[i].dir .. repos[i].name .. " && git pull")
-        os.execute("git add .")
-        os.execute("cd ..") -- Go back.
-
+        os.execute("cd " .. repos[i].dir .. repos[i].name .. " && git pull && git add .")
         ::continue::
     end
 
