@@ -63,6 +63,12 @@ local function update_repos()
         os.execute("git merge -s subtree --squash --allow-unrelated-histories -Xsubtree=" .. repos[i].dir .. repos[i].name .. " " .. repos[i].name .. "/" .. branch)
         os.execute("git remote remove " .. repos[i].name)
 
+        -- Is the repository already up-to-date?
+        if os.execute("git diff --quiet HEAD " .. repos[i].dir .. repos[i].name) then
+            print("Warning: " .. repos[i].name .. " is already up to date. Skipping.")
+            goto continue
+        end
+
         if one_pr == "false" then
             os.execute("git branch " .. repos[i].name .. "-update")
         end
@@ -71,8 +77,7 @@ local function update_repos()
             os.execute("git commit -m \"Bump " .. repos[i].name .. " to its latest commit\"")
         end
 
-        if one_pr == "false" and squash_commits == "false"
-            and os.execute("git log --branches --not --remotes --no-walk --grep=\"Bump " .. repos[i].name .. " to its latest commit\"") then
+        if one_pr == "false" and squash_commits == "false" then
             os.execute("git push origin " .. repos[i].name .. "-update:" .. repos[i].name .. "-update")
         end
 
