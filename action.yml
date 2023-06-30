@@ -134,7 +134,7 @@ runs:
               git push origin ${{ inputs.branch_name }}:${{ inputs.branch_name }} || true
               gh pr create --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} --title '${{ inputs.commit_message }}' --body 'Repositories were added or updated using the Submodules Alternative tool.' || true
             else # The `add_repos` option is disabled.
-              branches=$(lua -e 'local repos = require(arg[0]).repos; dofile("helper-functions.lua"); get_repo_branches(repos)' ${{ inputs.repos_filename }})
+              branches=$(lua -e 'local repos = require(${{ inputs.repos_filename }}).repos; dofile("helper-functions.lua"); get_repo_branches(repos)')
 
               for branch in ${branches[@]}; do
                 repo_name=${branch%-update}
