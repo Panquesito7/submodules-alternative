@@ -63,8 +63,6 @@ local function update_repos()
         os.execute("git merge -s subtree --squash --allow-unrelated-histories -Xsubtree=" .. repos[i].dir .. repos[i].name .. " " .. repos[i].name .. "/" .. branch)
         os.execute("git remote remove " .. repos[i].name)
 
-        os.execute("git add " .. repos[i].dir .. repos[i].name)
-
         if one_pr == false then
             os.execute("git checkout -b " .. repos[i].name .. "-update")
         end
@@ -80,7 +78,7 @@ local function update_repos()
         ::continue::
     end
 
-    if squash_commits == true then
+    if squash_commits == true and one_pr == false then
         os.execute("git commit -m " .. arg[2])
     end
 end
