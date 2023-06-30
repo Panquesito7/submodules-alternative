@@ -112,7 +112,7 @@ runs:
       shell: bash
       run: |
         if [[ ${{ inputs.update_repos }} == true ]]; then
-          lua update-repos.lua ${{ inputs.repos_filename }} ${{ inputs.commit_message_update }} ${{ inputs.squash_commits }} ${{ inputs.one_pr }}
+          lua update-repos.lua ${{ inputs.repos_filename }} "${{ inputs.commit_message_update }}" ${{ inputs.squash_commits }} ${{ inputs.one_pr }}
         fi
     - name: Push changes and create PR
       shell: bash
