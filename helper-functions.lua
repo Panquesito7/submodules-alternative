@@ -61,6 +61,11 @@ local function get_def_branch(repos, i)
     -- Currently supports: GitLab, GitHub, and BitBucket.
     local handle
 
+    -- Is branch already defined? Do not waste API requests.
+    if repos[i].def_branch ~= nil then
+        return repos[i].def_branch
+    end -- Continue otherwise.
+
     if vcs == "github" then
         handle = io.popen("wget -q -O - \"\"https://api.github.com/repos/" .. owner .. "/" .. repo .. "\"\" | jq -r '.default_branch'")
          if handle then
