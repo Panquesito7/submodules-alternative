@@ -59,14 +59,14 @@ local function clone_repos()
         os.execute("git read-tree --prefix " .. repos[i].dir .. repos[i].name .. " -u " .. repos[i].name .. "/" .. branch)
         os.execute("git remote remove " .. repos[i].name)
 
-        if squash_commits == false then
+        if squash_commits == "false" then
             os.execute("git commit -m \"Add " .. repos[i].name .. ".\"")
         end
 
         ::continue::
     end
 
-    if squash_commits == true then
+    if squash_commits == "true" then
         os.execute("git commit -m \"Add the given repositories.\"")
     end
 end

@@ -63,22 +63,22 @@ local function update_repos()
         os.execute("git merge -s subtree --squash --allow-unrelated-histories -Xsubtree=" .. repos[i].dir .. repos[i].name .. " " .. repos[i].name .. "/" .. branch)
         os.execute("git remote remove " .. repos[i].name)
 
-        if one_pr == false then
+        if one_pr == "false" then
             os.execute("git checkout -b " .. repos[i].name .. "-update")
         end
 
-        if squash_commits == false then
+        if squash_commits == "false" then
             os.execute("git commit -m \"Bump " .. repos[i].name .. " to its latest commit\"")
         end
 
-        if one_pr == false then
+        if one_pr == "false" and os.execute("git diff --quiet") == nil then
             os.execute("git push origin " .. repos[i].name .. "-update:" .. repos[i].name .. "-update")
         end
 
         ::continue::
     end
 
-    if squash_commits == true and one_pr == false then
+    if squash_commits == "true" and one_pr == "false" then
         os.execute("git commit -m " .. arg[2])
     end
 end
