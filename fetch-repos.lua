@@ -26,7 +26,7 @@ local squash_commits
 if arg[2] ~= nil then
     squash_commits = arg[2]
 else
-    squash_commits = false
+    squash_commits = "false"
 end
 
 --- @brief Clones all the repositories with the given options.
