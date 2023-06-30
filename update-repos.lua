@@ -26,7 +26,7 @@ local squash_commits
 if arg[3] ~= nil then
     squash_commits = arg[3]
 else
-    squash_commits = "false"
+    squash_commits = false
 end
 
 -- One PR option.
@@ -34,7 +34,7 @@ local one_pr
 if arg[4] ~= nil then
     one_pr = arg[4]
 else
-    one_pr = "false"
+    one_pr = false
 end
 
 --- @brief Updates all the repositories by
@@ -65,22 +65,22 @@ local function update_repos()
 
         os.execute("git add " .. repos[i].dir .. repos[i].name)
 
-        if one_pr == "false" then
+        if one_pr == false then
             os.execute("git checkout -b " .. repos[i].name .. "-update")
         end
 
-        if squash_commits == "false" then
+        if squash_commits == false then
             os.execute("git commit -m \"Bump " .. repos[i].name .. " to its latest commit\"")
         end
 
-        if one_pr == "false" then
+        if one_pr == false then
             os.execute("git push origin " .. repos[i].name .. "-update:" .. repos[i].name .. "-update")
         end
 
         ::continue::
     end
 
-    if squash_commits == "true" then
+    if squash_commits == true then
         os.execute("git commit -m " .. arg[2])
     end
 end
