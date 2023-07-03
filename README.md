@@ -125,10 +125,7 @@ The script already takes care of committing everything.
 
 ## To-do
 
-- If the squash commits option is enabled, a new repository is added, and the workflow is run again, the commits should be squashed using `force-with-lease`.
-- Make sure all the options and everything work perfectly fine.
-- Clean up the action code to work faster and better.
-- Create a PR per repository update, just like Dependabot does.
+All the pending work and to-do list can be found here: <https://github.com/users/Panquesito7/projects/3>
 
 ## License
 
