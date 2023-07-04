@@ -1,6 +1,7 @@
 # Submodules Alternative
 
 An easy-to-use Git (Sub)modules alternative to make the cloning process easier.
+**The project is still WIP, and still contains lots of bugs. It is recommended to use in small projects, until the tool is fairly stable.**
 
 ## What's the difference?
 
@@ -70,7 +71,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0 # This pulls changes before doing any changes
-      - uses: Panquesito7/submodules-alternative@v1.5.2
+      - uses: Panquesito7/submodules-alternative@v1.5.3
         with:
           repos_filename: repos                       # In case your file is named `repos.lua`, you can leave it as `repos`.
           use_pr: true                                # Whether to create a pull request when updating/adding the repositories.
