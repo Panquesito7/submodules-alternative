@@ -21,7 +21,6 @@
     Arguments
     [1]: Repositories filename (e.g. `repos`).
     [2]: Whether to squash all the commits or not.
-         DISABLED FOR NOW AS IT CAUSES AN ISSUE WITH THE SUBTREES.
     [3]: One PR option, which uses multiple branches if disabled.
          The action workflow takes care of this in case this option is enabled.
     [4]: Commit message (only if `squash_commits` is enabled).
@@ -53,7 +52,6 @@ end
 --- Nothing will be done if the repositories are not behind the remote.
 --- @return nil
 local function update_repos()
-    local count = 0
     for i = 1, #repos do
         -- Make sure all of the variables are set.
         helper_functions.check_variables(repos, i)
@@ -71,7 +69,9 @@ local function update_repos()
             goto continue
         end
 
-        os.execute("git subtree pull --prefix " .. repos[i].dir .. repos[i].name .. " " .. repos[i].url.. " " .. branch .. " --squash --message \"Bump " .. repos[i].name .. " to its latest commit\"")
+        os.execute("git remote add -f " .. repos[i].name .. " " .. repos[i].url)
+        os.execute("git merge -s subtree --squash --allow-unrelated-histories -Xsubtree=" .. repos[i].dir .. repos[i].name .. " " .. repos[i].name .. "/" .. branch)
+        os.execute("git remote remove " .. repos[i].name)
 
         -- Is the repository already up-to-date?
         if os.execute("git diff --quiet HEAD " .. repos[i].dir .. repos[i].name) then
@@ -79,22 +79,26 @@ local function update_repos()
             goto continue
         end
 
+        os.execute("git checkout --theirs .")
+        os.execute("git add " .. repos[i].dir .. repos[i].name)
+
         if one_pr == "false" then
             os.execute("git branch " .. repos[i].name .. "-update")
+        end
+        
+        if squash_commits == "false" then
+            os.execute("git commit -m \"Bump " .. repos[i].name .. " to its latest commit\"")
         end
 
         if one_pr == "false" and squash_commits == "false" then
             os.execute("git push origin " .. repos[i].name .. "-update:" .. repos[i].name .. "-update")
         end
 
-        count = count + 1
         ::continue::
     end
 
     if squash_commits == "true" and one_pr == "true" then
-        --os.execute("git reset --soft HEAD~" .. count)
-        --os.execute("git commit -m \"" .. arg[4] .. "\"")
-        print("This option has been disabled for now, as it causes an issue with the subtrees preventing them from being updated properly or doing other changes.")
+        os.execute("git commit -m \"" .. arg[4] .. "\"")
     end
 end
 

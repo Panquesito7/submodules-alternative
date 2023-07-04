@@ -34,7 +34,7 @@ inputs:
     required: true
     default: "true"
   squash_commits:
-    description: "Whether to squash all commits into one or not (disabled for now)."
+    description: "Whether to squash all commits into one or not."
     required: false
     default: "false"
   one_pr:
@@ -88,20 +88,14 @@ runs:
         wget https://raw.githubusercontent.com/Panquesito7/submodules-alternative/main/helper-functions.lua
 
         if [[ ${{ inputs.add_repos }} == true ]]; then
-          # Committing is necessary if we want to revert the changes and fetching
-          # the script at the same time, as otherwise, the scriptS below would fail.
           if [[ ! -f fetch-repos.lua ]]; then
             wget https://raw.githubusercontent.com/Panquesito7/submodules-alternative/main/fetch-repos.lua
-            git add fetch-repos.lua
-            git commit -m "Get the fetch-repos script"
           fi
         fi
 
         if [[ ${{ inputs.update_repos }} == true ]]; then
           if [[ ! -f update-repos.lua ]]; then
             wget https://raw.githubusercontent.com/Panquesito7/submodules-alternative/main/update-repos.lua
-            git add update-repos.lua
-            git commit -m "Get the update-repos script"
           fi
         fi
     - name: Clone repositories
@@ -119,16 +113,6 @@ runs:
     - name: Push changes and create PR
       shell: bash
       run: |
-        # Removes the `fetch-repos.lua` script from the repository, as it is not needed.
-        if [[ ${{ inputs.add_repos }} == true ]]; then
-          git revert $(git log --branches --not --remotes --grep 'Get the fetch-repos script' --oneline | cut -d' ' -f1) --no-edit || true
-        fi
-
-        # Removes the `update-repos.lua` script from the repository, as it is not needed.
-        if [[ ${{ inputs.update_repos }} == true ]]; then
-          git revert $(git log --branches --not --remotes --grep 'Get the update-repos script' --oneline | cut -d' ' -f1) --no-edit || true
-        fi
-
         if [[ ${{ inputs.use_pr }} == true ]]; then
           if [[ ${{ inputs.one_pr }} == true ]]; then
             git push origin ${{ inputs.branch_name }}:${{ inputs.branch_name }} || true

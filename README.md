@@ -45,11 +45,6 @@ return {
 This GitHub Action workflow will automatically update or clone the desired repositories.\
 You can choose to update, clone, or do both actions. You can also configure how the script works.
 
-> **Note**
->
-> The `squash_commits` option is disabled and should not be used\
-> due to some problems with the subtrees. It will still squash the commits as most as possible.
-
 ```yml
 name: Submodules Alternative
 on:
@@ -71,7 +66,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0 # This pulls changes before doing any changes
-      - uses: Panquesito7/submodules-alternative@v1.5.3
+      - uses: Panquesito7/submodules-alternative@v1.5.4
         with:
           repos_filename: repos                       # In case your file is named `repos.lua`, you can leave it as `repos`.
           use_pr: true                                # Whether to create a pull request when updating/adding the repositories.
@@ -80,7 +75,7 @@ jobs:
           commit_message_update: "Bump repositories"  # Commit message used when updating all the repositories.
           add_repos: false                            # If enabled, this will clone all the repositories listed in your repos file.
           update_repos: true                          # When enabled, this will attempt to update all the repositories.
-          squash_commits: false                       # Whether to squash all commits or not on every repository update/addition. Cannot be used if `one_pr` is disabled. The option has been disabled for now due to some problems with the subtrees.
+          squash_commits: false                       # Whether to squash all commits or not on every repository update/addition. Cannot be used if `one_pr` is disabled.
           one_pr: false                               # Creates one single PR for everything if enabled. Works only for `update_repos` if disabled.
 ```
 
