@@ -17,6 +17,14 @@
 -- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 --
 
+--[[
+    Arguments
+    [1]: Repositories filename (e.g. `repos`).
+    [2]: Commit message (only if `squash_commits` is enabled).
+    [3]: One PR option, which uses multiple branches if disabled.
+         The action workflow takes care of this in case this option is enabled.
+--]]
+
 local data = require(arg[1])
 local repos = data.repos
 local helper_functions = require("helper-functions")
