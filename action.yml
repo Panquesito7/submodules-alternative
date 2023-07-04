@@ -108,7 +108,7 @@ runs:
       shell: bash
       run: |
         if [[ ${{ inputs.add_repos }} == true ]]; then
-          lua fetch-repos.lua ${{ inputs.repos_filename }} ${{ inputs.squash_commits }} "${{ inputs.commit_message }}""
+          lua fetch-repos.lua ${{ inputs.repos_filename }} ${{ inputs.squash_commits }} "${{ inputs.commit_message }}"
         fi
     - name: Update repositories
       shell: bash
