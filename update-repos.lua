@@ -52,6 +52,7 @@ end
 --- Nothing will be done if the repositories are not behind the remote.
 --- @return nil
 local function update_repos()
+    local count = 0
     for i = 1, #repos do
         -- Make sure all of the variables are set.
         helper_functions.check_variables(repos, i)
@@ -69,9 +70,7 @@ local function update_repos()
             goto continue
         end
 
-        os.execute("git remote add -f " .. repos[i].name .. " " .. repos[i].url)
-        os.execute("git merge -s subtree --squash --allow-unrelated-histories -Xsubtree=" .. repos[i].dir .. repos[i].name .. " " .. repos[i].name .. "/" .. branch)
-        os.execute("git remote remove " .. repos[i].name)
+        os.execute("git subtree pull --prefix " .. repos[i].dir .. repos[i].name .. " " .. repos[i].remote .. " " .. branch .. " --squash --message \"Bump " .. repos[i].name .. " to its latest commit\"")
 
         -- Is the repository already up-to-date?
         if os.execute("git diff --quiet HEAD " .. repos[i].dir .. repos[i].name) then
@@ -83,19 +82,17 @@ local function update_repos()
             os.execute("git branch " .. repos[i].name .. "-update")
         end
 
-        if squash_commits == "false" then
-            os.execute("git commit -m \"Bump " .. repos[i].name .. " to its latest commit\"")
-        end
-
         if one_pr == "false" and squash_commits == "false" then
             os.execute("git push origin " .. repos[i].name .. "-update:" .. repos[i].name .. "-update")
         end
 
+        count = count + 1
         ::continue::
     end
 
     if squash_commits == "true" and one_pr == "false" then
-        os.execute("git commit -m " .. arg[2])
+        os.execute("git reset --soft HEAD~" .. count)
+        os.execute("git commit -m \"" .. arg[2] .. "\"")
     end
 end
 

@@ -21,7 +21,7 @@
     Arguments
     [1]: Repositories filename (e.g. `repos`).
     [2]: Whether to squash all the commits or not.
-    TODO: let the user choose the commit message.
+    [3]: Commit message that's being used. Only if the squash commits option is enabled.
 --]]
 
 local data = require(arg[1])
@@ -42,6 +42,7 @@ end
 --- @return nil
 local function clone_repos()
     local branch
+    local count = 0
     for i = 1, #repos do
         -- Create the given directory if it does not exist.
         os.execute("mkdir -p " .. repos[i].dir)
@@ -62,19 +63,15 @@ local function clone_repos()
             goto continue
         end
 
-        os.execute("git remote add -f " .. repos[i].name .. " " .. repos[i].url)
-        os.execute("git read-tree --prefix " .. repos[i].dir .. repos[i].name .. " -u " .. repos[i].name .. "/" .. branch)
-        os.execute("git remote remove " .. repos[i].name)
-
-        if squash_commits == "false" then
-            os.execute("git commit -m \"Add " .. repos[i].name .. ".\"")
-        end
+        os.execute("git subtree add --prefix " .. repos[i].dir .. repos[i].name .. " " .. repos[i].url .. " " .. branch .. " --squash --message \"Add " .. repos[i].name .. ".\"")
+        count = count + 1
 
         ::continue::
     end
 
     if squash_commits == "true" then
-        os.execute("git commit -m \"Add the given repositories.\"")
+        os.execute("git reset --soft HEAD~" .. count)
+        os.execute("git commit -m \"" .. arg[3] .. "\"")
     end
 end
 
