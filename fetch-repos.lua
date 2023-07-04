@@ -17,6 +17,13 @@
 -- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 --
 
+--[[
+    Arguments
+    [1]: Repositories filename (e.g. `repos`).
+    [2]: Whether to squash all the commits or not.
+    TODO: let the user choose the commit message.
+--]]
+
 local data = require(arg[1])
 local repos = data.repos
 local helper_functions = require("helper-functions")
