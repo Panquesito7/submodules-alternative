@@ -70,7 +70,7 @@ local function update_repos()
             goto continue
         end
 
-        os.execute("git subtree pull --prefix " .. repos[i].dir .. repos[i].name .. " " .. repos[i].remote .. " " .. branch .. " --squash --message \"Bump " .. repos[i].name .. " to its latest commit\"")
+        os.execute("git subtree pull --prefix " .. repos[i].dir .. repos[i].name .. " " .. repos[i].url.. " " .. branch .. " --squash --message \"Bump " .. repos[i].name .. " to its latest commit\"")
 
         -- Is the repository already up-to-date?
         if os.execute("git diff --quiet HEAD " .. repos[i].dir .. repos[i].name) then
