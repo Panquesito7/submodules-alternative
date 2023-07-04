@@ -79,7 +79,7 @@ local function update_repos()
             goto continue
         end
 
-        os.execute("git checkout --theirs .")
+        os.execute("git checkout --theirs " .. repos[i].dir .. repos[i].name)
         os.execute("git add " .. repos[i].dir .. repos[i].name)
 
         if one_pr == "false" then
