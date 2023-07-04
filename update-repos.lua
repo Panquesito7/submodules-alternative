@@ -85,7 +85,7 @@ local function update_repos()
         if one_pr == "false" then
             os.execute("git branch " .. repos[i].name .. "-update")
         end
-        
+
         if squash_commits == "false" then
             os.execute("git commit -m \"Bump " .. repos[i].name .. " to its latest commit\"")
         end
