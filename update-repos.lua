@@ -21,7 +21,9 @@
     Arguments
     [1]: Repositories filename (e.g. `repos`).
     [2]: Commit message (only if `squash_commits` is enabled).
-    [3]: One PR option, which uses multiple branches if disabled.
+    [3]: Whether to squash all the commits or not.
+         Cannot be used if `one_pr` is disabled.
+    [4]: One PR option, which uses multiple branches if disabled.
          The action workflow takes care of this in case this option is enabled.
 --]]
 
