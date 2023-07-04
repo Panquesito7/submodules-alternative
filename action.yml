@@ -20,7 +20,7 @@ inputs:
   commit_message:
     description: "The commit/PR message to use when adding new repositories."
     required: false
-    default: "Add repositories"
+    default: "Add the given repositories"
   commit_message_update:
     description: "The commit/PR message to use when updating all the repositories."
     required: false
@@ -34,7 +34,7 @@ inputs:
     required: true
     default: "true"
   squash_commits:
-    description: "Whether to squash all commits into one or not."
+    description: "Whether to squash all commits into one or not (disabled for now)."
     required: false
     default: "false"
   one_pr:
@@ -108,13 +108,13 @@ runs:
       shell: bash
       run: |
         if [[ ${{ inputs.add_repos }} == true ]]; then
-          lua fetch-repos.lua ${{ inputs.repos_filename }} ${{ inputs.squash_commits }} ${{ inputs.commit_message }}
+          lua fetch-repos.lua ${{ inputs.repos_filename }} ${{ inputs.squash_commits }} "${{ inputs.commit_message }}""
         fi
     - name: Update repositories
       shell: bash
       run: |
         if [[ ${{ inputs.update_repos }} == true ]]; then
-          lua update-repos.lua ${{ inputs.repos_filename }} "${{ inputs.commit_message_update }}" ${{ inputs.squash_commits }} ${{ inputs.one_pr }}
+          lua update-repos.lua ${{ inputs.repos_filename }} ${{ inputs.squash_commits }} ${{ inputs.one_pr }} "${{ inputs.commit_message_update }}"
         fi
     - name: Push changes and create PR
       shell: bash

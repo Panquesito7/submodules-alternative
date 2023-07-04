@@ -21,6 +21,7 @@
     Arguments
     [1]: Repositories filename (e.g. `repos`).
     [2]: Whether to squash all the commits or not.
+         DISABLED FOR NOW AS IT CAUSES AN ISSUE WITH THE SUBTREES.
     [3]: Commit message that's being used. Only if the squash commits option is enabled.
 --]]
 
@@ -70,8 +71,9 @@ local function clone_repos()
     end
 
     if squash_commits == "true" then
-        os.execute("git reset --soft HEAD~" .. count)
-        os.execute("git commit -m \"" .. arg[3] .. "\"")
+        --os.execute("git reset --soft HEAD~" .. count)
+        --os.execute("git commit -m \"" .. arg[3] .. "\"")}
+        print("This option has been disabled for now, as it causes an issue with the subtrees preventing them from being updated properly or doing other changes.")
     end
 end
 

@@ -20,11 +20,12 @@
 --[[
     Arguments
     [1]: Repositories filename (e.g. `repos`).
-    [2]: Commit message (only if `squash_commits` is enabled).
-    [3]: Whether to squash all the commits or not.
-         Cannot be used if `one_pr` is disabled.
-    [4]: One PR option, which uses multiple branches if disabled.
+    [2]: Whether to squash all the commits or not.
+         DISABLED FOR NOW AS IT CAUSES AN ISSUE WITH THE SUBTREES.
+    [3]: One PR option, which uses multiple branches if disabled.
          The action workflow takes care of this in case this option is enabled.
+    [4]: Commit message (only if `squash_commits` is enabled).
+         Cannot be used if `one_pr` is disabled.
 --]]
 
 local data = require(arg[1])
@@ -33,16 +34,16 @@ local helper_functions = require("helper-functions")
 
 -- Squash commits option.
 local squash_commits
-if arg[3] ~= nil then
-    squash_commits = arg[3]
+if arg[2] ~= nil then
+    squash_commits = arg[2]
 else
     squash_commits = "false"
 end
 
 -- One PR option.
 local one_pr
-if arg[4] ~= nil then
-    one_pr = arg[4]
+if arg[3] ~= nil then
+    one_pr = arg[3]
 else
     one_pr = "false"
 end
@@ -90,9 +91,10 @@ local function update_repos()
         ::continue::
     end
 
-    if squash_commits == "true" and one_pr == "false" then
-        os.execute("git reset --soft HEAD~" .. count)
-        os.execute("git commit -m \"" .. arg[2] .. "\"")
+    if squash_commits == "true" and one_pr == "true" then
+        --os.execute("git reset --soft HEAD~" .. count)
+        --os.execute("git commit -m \"" .. arg[4] .. "\"")
+        print("This option has been disabled for now, as it causes an issue with the subtrees preventing them from being updated properly or doing other changes.")
     end
 end
 
