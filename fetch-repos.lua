@@ -74,7 +74,7 @@ local function clone_repos()
     end
 
     if squash_commits == "true" then
-        os.execute("git commit -m \"" .. arg[3] .. "\"")}
+        os.execute("git commit -m \"" .. arg[3] .. "\"")
     end
 end
 
