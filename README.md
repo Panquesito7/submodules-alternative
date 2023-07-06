@@ -1,7 +1,7 @@
 # Submodules Alternative
 
-An easy-to-use Git (Sub)modules alternative to make the cloning process easier.
-**The project is still WIP, and still contains lots of bugs. It is recommended to use in small projects, until the tool is fairly stable.**
+An easy-to-use Git (Sub)modules alternative to make the cloning process easier.\
+**The project is still WIP and still contains bugs. It is recommended to use in small projects until the tool is fairly stable.**
 
 ## What's the difference?
 
