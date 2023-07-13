@@ -79,9 +79,10 @@ runs:
           fi
         fi
     - name: Setup Lua
-      uses: xpol/setup-lua@master
-      with:
-        lua-version: "5.3.3"
+      shell: bash
+      run: |
+        sudo apt-get -qq update
+        sudo apt-get -qq install lua5.3
     - name: Fetch scripts
       shell: bash
       run: |
