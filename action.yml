@@ -41,6 +41,10 @@ inputs:
     description: "Creates one single PR for updating all the repositories. This does not apply to the `fetch-repos` script. `squash_commits` must be disabled!"
     required: false
     default: "false"
+  delete_existing_branches:
+    description: "Deletes the branches that updated the subtrees. Note that this is done only on action run, not on immediate PR merge."
+    required: false
+    default: "true"
 runs:
   using: "composite"
   steps:
@@ -97,6 +101,25 @@ runs:
         if [[ ${{ inputs.update_repos }} == true ]]; then
           if [[ ! -f update-repos.lua ]]; then
             wget https://raw.githubusercontent.com/Panquesito7/submodules-alternative/main/update-repos.lua
+          fi
+        fi
+    - name: Delete existing branches
+      shell: bash
+      run: |
+        if [[ ${{ inputs.update_repos }} == true ]] && [[ ${{ inputs.delete_existing_branches }} == true ]]; then
+          branches=$(lua -e 'local repos = require("${{ inputs.repos_filename }}").repos; dofile("helper-functions.lua"); get_repo_branches(repos)')
+          for branch in ${branches[@]}; do
+            if git ls-remote --heads origin $branch | grep -q $branch; then
+              if git diff --name-only origin/${GITHUB_REF##*/} $branch | grep -q $branch; then
+                git push origin -d $branch
+              fi
+            fi
+          done
+
+          if git ls-remote --heads origin ${{ inputs.branch_name }} | grep -q ${{ inputs.branch_name }}; then
+            if git diff --name-only origin/${GITHUB_REF##*/} ${{ inputs.branch_name }} | grep -q ${{ inputs.branch_name }}; then
+              git push origin -d ${{ inputs.branch_name }}
+            fi
           fi
         fi
     - name: Clone repositories

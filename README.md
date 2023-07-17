@@ -66,7 +66,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0 # This pulls changes before doing any changes
-      - uses: Panquesito7/submodules-alternative@v1.5.4
+      - uses: Panquesito7/submodules-alternative@v1.5.5
         with:
           repos_filename: repos                       # In case your file is named `repos.lua`, you can leave it as `repos`.
           use_pr: true                                # Whether to create a pull request when updating/adding the repositories.
@@ -77,7 +77,15 @@ jobs:
           update_repos: true                          # When enabled, this will attempt to update all the repositories.
           squash_commits: false                       # Whether to squash all commits or not on every repository update/addition. Cannot be used if `one_pr` is disabled.
           one_pr: false                               # Creates one single PR for everything if enabled. Works only for `update_repos` if disabled.
+          delete_existing_branches: true              # Deletes the branches that updated the subtrees. Note that this is done only on action run, not on immediate PR merge.
 ```
+
+If `delete_existing_branches` is enabled, it will attempt to delete the branches before running the scripts to ensure there are no merge conflicts.\
+However, this is not the most efficient way of deleting the branches. These are other alternatives I recommend:
+
+1. Automatically [delete branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-the-automatic-deletion-of-branches) on PR merging (recommended).
+2. Manually delete the branches (not recommended).
+3. Use a GitHub Action like [Delete Merged Branch](https://github.com/SvanBoxel/delete-merged-branch).
 
 You can also configure to run the workflow manually by using `workflow_dispatch` instead of `schedule`.\
 For more information about Cron, you can check [CronHub](https://crontab.cronhub.io/).
