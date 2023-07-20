@@ -48,11 +48,11 @@ end
 -- fallback/specified branch in the repositories file.
 --- @param repos table The table containing all of the repositories.
 --- @param i number The index of the repository to check.
-local function get_def_branch(repos, i)
+local function get_def_branch(repo)
     -- Get the current VCS that is being used.
     local branch
-    local vcs = repos[i].url:match("https://(%w+).%w+")
-    local owner, repo = repos[i].url:match(vcs .. ".%w+/(.+)/(.+)")
+    local vcs = repo.url:match("https://(%w+).%w+")
+    local owner, repo = repo.url:match(vcs .. ".%w+/(.+)/(.+)")
 
     -- Remove `.git` from `repo` if available.
     repo = repo:gsub(".git", "")
@@ -62,21 +62,21 @@ local function get_def_branch(repos, i)
     local handle
 
     -- Is branch already defined? Do not waste API requests.
-    if repos[i].def_branch ~= nil then
-        return repos[i].def_branch
+    if repo.def_branch ~= nil then
+        return repo.def_branch
     end -- Continue otherwise.
 
     if vcs == "github" then
         handle = io.popen("wget -q -O - \"\"https://api.github.com/repos/" .. owner .. "/" .. repo .. "\"\" | jq -r '.default_branch'")
          if handle then
             -- Print message and update branch only if default branch not set.
-            if repos[i].def_branch == nil then
+            if repo.def_branch == nil then
                 branch = handle:read("*a")
                 handle:close()
 
                 print("Found branch for `" .. repo .. "` using GitHub API.")
             else
-                branch = repos[i].def_branch
+                branch = repo.def_branch
             end
         else
             print("Error: Could not obtain the default branch name from the given URL.")
@@ -87,13 +87,13 @@ local function get_def_branch(repos, i)
         handle = io.popen("wget -q -O - \"\"https://gitlab.com/api/v4/projects/" .. owner .. "%2F" .. repo .. "\"\" | jq -r '.default_branch'")
         if handle then
             -- Print message and update branch only if default branch not set.
-            if repos[i].def_branch == nil then
+            if repo.def_branch == nil then
                 branch = handle:read("*a")
                 handle:close()
 
                 print("Found branch for `" .. repo .. "` using GitLab API.")
             else
-                branch = repos[i].def_branch
+                branch = repo.def_branch
             end
         else
             print("Error: Could not obtain the default branch name from the given URL.")
@@ -104,13 +104,13 @@ local function get_def_branch(repos, i)
         handle = io.popen("wget -q -O - \"\"https://api.bitbucket.org/2.0/repositories/" .. owner .. "/" .. repo .. "\"\" | jq -r '.mainbranch.name'")
         if handle then
             -- Print message and update branch only if default branch not set.
-            if repos[i].def_branch == nil then
+            if repo.def_branch == nil then
                 branch = handle:read("*a")
                 handle:close()
 
                 print("Found branch for `" .. repo .. "` using BitBucket API.")
             else
-                branch = repos[i].def_branch
+                branch = repo.def_branch
             end
         else
             print("Error: Could not obtain the default branch name from the given URL.")
@@ -120,8 +120,8 @@ local function get_def_branch(repos, i)
     -- Fallback.
     else
         print("The default branch could not be found for `" .. repo .. "`. Using provided default branch instead.")
-        if repos[i].def_branch ~= nil then
-            branch = repos[i].def_branch
+        if repo.def_branch ~= nil then
+            branch = repo.def_branch
             print("Found provided default branch for `" .. repo .. "`.")
         else
             print("Could not find provided default branch for `" .. repo .. "`. Skipping.")
@@ -135,8 +135,7 @@ local function get_def_branch(repos, i)
     return branch
 end
 
---- @brief Gets the branches used
---- when updating the repositories.
+--- @brief Gets the branches used when updating the repositories.
 --- This is used in the `action.yml` file.
 --- @param repos table The table containing all of the repositories.
 --- @return nil

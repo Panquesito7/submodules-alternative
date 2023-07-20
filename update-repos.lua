@@ -63,7 +63,7 @@ local function update_repos()
         end
 
         -- Attempt to get the default branch.
-        local branch = helper_functions.get_def_branch(repos, i)
+        local branch = helper_functions.get_def_branch(repos[i]) or ""
 
         if branch == nil then
             goto continue
@@ -83,7 +83,18 @@ local function update_repos()
         os.execute("git add " .. repos[i].dir .. repos[i].name)
 
         if one_pr == "false" then
-            os.execute("git branch " .. repos[i].name .. "-update")
+            local default_branch = io.popen("git remote show origin | grep \"HEAD branch\" | cut -d' ' -f5"):read("*a")
+
+            if default_branch then
+                default_branch = default_branch:gsub("\n", "")
+                os.execute("git checkout " .. default_branch)
+            else
+                print("Error: Could not get the default branch of the current repository.")
+                goto continue
+            end
+
+            -- Create a new branch.
+            os.execute("git checkout -b " .. repos[i].name .. "-update")
         end
 
         if squash_commits == "false" then

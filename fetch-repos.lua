@@ -56,7 +56,7 @@ local function clone_repos()
         helper_functions.check_variables(repos, i)
 
         -- Get the default branch.
-        branch = helper_functions.get_def_branch(repos, i) or ""
+        branch = helper_functions.get_def_branch(repos[i]) or ""
 
         if branch == nil then
             goto continue
