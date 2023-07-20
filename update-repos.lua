@@ -54,7 +54,7 @@ end
 local function update_repos()
     for i = 1, #repos do
         -- Make sure all of the variables are set.
-        helper_functions.check_variables(repos, i)
+        helper_functions.check_variables(repos[i])
 
         -- Make sure the repository is cloned already.
         if os.execute("test -d " .. repos[i].dir .. repos[i].name) == nil then

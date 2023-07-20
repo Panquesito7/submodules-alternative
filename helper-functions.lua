@@ -22,24 +22,24 @@
 --- @param repo table The table containing all of the repositories.
 --- @param i number The index of the repository to check.
 --- @return nil
-local function check_variables(repo, i)
-    if repo[i].name == nil then
-        print("Error: `name` is not set for repository " .. i)
+local function check_variables(repo)
+    if repo.name == nil then
+        print("Error: `name` is not set for repository `" .. repo.name .. "`.")
         os.exit(1)
     end
 
-    if repo[i].url == nil then
-        print("Error: `url` is not set for repository " .. i)
+    if repo.url == nil then
+        print("Error: `url` is not set for repository `" .. repo.name .. "`.")
         os.exit(1)
     end
 
-    if repo[i].dir == nil then
-        print("Error: `dir` is not set for repository " .. i)
+    if repo.dir == nil then
+        print("Error: `dir` is not set for repository `" .. repo.name .. "`.")
         os.exit(1)
     end
 
-    if repo[i].def_branch == nil then
-        print("Warning: default branch not specified for `" .. repo[i].name .. "`. Attempting to obtain the default branch using the API.")
+    if repo.def_branch == nil then
+        print("Warning: default branch not specified for `" .. repo.name .. "`. Attempting to obtain the default branch using the API.")
     end
 end
 
@@ -52,10 +52,10 @@ local function get_def_branch(repo)
     -- Get the current VCS that is being used.
     local branch
     local vcs = repo.url:match("https://(%w+).%w+")
-    local owner, repo = repo.url:match(vcs .. ".%w+/(.+)/(.+)")
+    local owner, repo_url = repo.url:match(vcs .. ".%w+/(.+)/(.+)")
 
     -- Remove `.git` from `repo` if available.
-    repo = repo:gsub(".git", "")
+    repo_url = repo_url:gsub(".git", "")
 
     -- Attempt to obtain the default branch name from the given URL.
     -- Currently supports: GitLab, GitHub, and BitBucket.
@@ -67,14 +67,14 @@ local function get_def_branch(repo)
     end -- Continue otherwise.
 
     if vcs == "github" then
-        handle = io.popen("wget -q -O - \"\"https://api.github.com/repos/" .. owner .. "/" .. repo .. "\"\" | jq -r '.default_branch'")
+        handle = io.popen("wget -q -O - \"\"https://api.github.com/repos/" .. owner .. "/" .. repo_url .. "\"\" | jq -r '.default_branch'")
          if handle then
             -- Print message and update branch only if default branch not set.
             if repo.def_branch == nil then
                 branch = handle:read("*a")
                 handle:close()
 
-                print("Found branch for `" .. repo .. "` using GitHub API.")
+                print("Found branch for `" .. repo_url .. "` using GitHub API.")
             else
                 branch = repo.def_branch
             end
@@ -84,14 +84,14 @@ local function get_def_branch(repo)
             return nil
         end
     elseif vcs == "gitlab" then
-        handle = io.popen("wget -q -O - \"\"https://gitlab.com/api/v4/projects/" .. owner .. "%2F" .. repo .. "\"\" | jq -r '.default_branch'")
+        handle = io.popen("wget -q -O - \"\"https://gitlab.com/api/v4/projects/" .. owner .. "%2F" .. repo_url .. "\"\" | jq -r '.default_branch'")
         if handle then
             -- Print message and update branch only if default branch not set.
             if repo.def_branch == nil then
                 branch = handle:read("*a")
                 handle:close()
 
-                print("Found branch for `" .. repo .. "` using GitLab API.")
+                print("Found branch for `" .. repo_url .. "` using GitLab API.")
             else
                 branch = repo.def_branch
             end
@@ -101,14 +101,14 @@ local function get_def_branch(repo)
             return nil
         end
     elseif vcs == "bitbucket" then
-        handle = io.popen("wget -q -O - \"\"https://api.bitbucket.org/2.0/repositories/" .. owner .. "/" .. repo .. "\"\" | jq -r '.mainbranch.name'")
+        handle = io.popen("wget -q -O - \"\"https://api.bitbucket.org/2.0/repositories/" .. owner .. "/" .. repo_url .. "\"\" | jq -r '.mainbranch.name'")
         if handle then
             -- Print message and update branch only if default branch not set.
             if repo.def_branch == nil then
                 branch = handle:read("*a")
                 handle:close()
 
-                print("Found branch for `" .. repo .. "` using BitBucket API.")
+                print("Found branch for `" .. repo_url .. "` using BitBucket API.")
             else
                 branch = repo.def_branch
             end
@@ -119,12 +119,12 @@ local function get_def_branch(repo)
         end
     -- Fallback.
     else
-        print("The default branch could not be found for `" .. repo .. "`. Using provided default branch instead.")
+        print("The default branch could not be found for `" .. repo_url .. "`. Using provided default branch instead.")
         if repo.def_branch ~= nil then
             branch = repo.def_branch
-            print("Found provided default branch for `" .. repo .. "`.")
+            print("Found provided default branch for `" .. repo_url .. "`.")
         else
-            print("Could not find provided default branch for `" .. repo .. "`. Skipping.")
+            print("Could not find provided default branch for `" .. repo_url .. "`. Skipping.")
             return nil
         end
     end
