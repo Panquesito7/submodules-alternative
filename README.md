@@ -8,10 +8,11 @@ An easy-to-use Git (Sub)modules alternative to make the cloning process easier.\
 ## What's the difference?
 
 - Cloning repositories is now super easier: anyone can clone your repository **without the need for Git**. No more `clone recursive` or `submodule update` commands!
-- Submodule addition/update is automated by GitHub Actions (if desired), making it easier to integrate into your projects.
+- Subtree addition/update is automated by GitHub Actions (if desired), making it easier to integrate into your projects.
 - Lightweight and documented codebase in [Lua](https://www.lua.org/) v5.3.3.
 - Git Submodules can sometimes be messy or confusing, which this tool aims to solve.
 - Lets you choose the desired branch of the repository, unlike Git Submodules which automatically chooses the default branch.
+- Easily take a look at the changes **directly in the PR** without extra effort. Git Submodules changes cannot be seen via the PR diff.
 <!-- - Easily specify which files are ignored at the moment of updating the repositories. This is very useful if you want to modify a repository/submodule. -->
 
 ## Usage
@@ -34,6 +35,11 @@ local repos = {
         url = "https://github.com/realstealthninja/texto",
         dir = "libs/"
     },
+    {
+        name = "panqkart",
+        url = "https://github.com/panqkart/panqkart",
+        dir = "games/"
+    }
 }
 
 -- Fully needed, so that the scripts can access the repositories.
