@@ -67,6 +67,10 @@ local function clone_repos()
         os.execute("git remote remove " .. repos[i].name)
 
         if squash_commits == "false" then
+            -- Setup Git username/mail locally.
+            os.execute("git config --local user.name github-actions[bot]")
+            os.execute("git config --local user.email 'github-actions@users.noreply.github.com'")
+
             os.execute("git commit -m \"Add " .. repos[i].name .. ".\"")
         end
 
@@ -74,6 +78,10 @@ local function clone_repos()
     end
 
     if squash_commits == "true" then
+        -- Setup Git username/mail locally.
+        os.execute("git config --local user.name github-actions[bot]")
+        os.execute("git config --local user.email 'github-actions@users.noreply.github.com'")
+
         os.execute("git commit -m \"" .. arg[3] .. "\"")
     end
 end
