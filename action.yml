@@ -153,7 +153,7 @@ runs:
 
               for branch in ${branches[@]}; do
                 repo_name=${branch%-update}
-                gh pr create --base ${GITHUB_REF##*/} --head $branch --title 'Bump `'$repo_name'` to its latest commit' --body 'The repository `'$repo_name'` was updated to its latest commit.'' || true
+                gh pr create --base ${GITHUB_REF##*/} --head $branch --title 'Bump `'$repo_name'` to its latest commit' --body 'The repository `'$repo_name'` was updated to its latest commit.' || true
               done
             fi
           fi
