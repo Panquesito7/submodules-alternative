@@ -1,5 +1,5 @@
 name: "Submodules Alternative"
-description: "Adds/updates all repositories added by the using the Submodules Alternative tool."
+description: "Adds/updates all repositories added by using the Submodules Alternative tool."
 author: "Panquesito7"
 branding:
   icon: git-pull-request
@@ -38,7 +38,7 @@ inputs:
     required: false
     default: "false"
   one_pr:
-    description: "Creates one single PR for updating all the repositories. This does not apply to the `fetch-repos` script. `squash_commits` must be disabled!"
+    description: "Creates one single PR for updating all the repositories. This does not apply to the `fetch-repos` script. Doesn't work with `squash_commits`."
     required: false
     default: "false"
   delete_existing_branches:
@@ -53,6 +53,11 @@ runs:
       run: |
         if [[ ${{ inputs.add_repos }} == false ]] && [[ ${{ inputs.update_repos }} == false ]]; then
           echo "Both 'add_repos' and 'update_repos' are disabled. Please enable at least one of them."
+          exit 1
+        fi
+
+        if [[ ${{ inputs.squash_commits }} == true ]] && [[ ${{ inputs.one_pr }} == false ]]; then
+          echo "The 'one_pr' option doesn't work together with 'squash_commits' enabled. Please adjust accordingly.
           exit 1
         fi
     - name: Setup Git configurations
