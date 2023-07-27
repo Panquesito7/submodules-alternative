@@ -57,7 +57,7 @@ runs:
         fi
 
         if [[ ${{ inputs.squash_commits }} == true ]] && [[ ${{ inputs.one_pr }} == false ]]; then
-          echo "The 'one_pr' option doesn't work together with 'squash_commits' enabled. Please adjust accordingly.
+          echo "The 'one_pr' option doesn't work together with 'squash_commits' enabled. Please adjust accordingly."
           exit 1
         fi
     - name: Setup Git configurations
