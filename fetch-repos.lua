@@ -43,6 +43,12 @@ end
 local function clone_repos()
     local branch
     for i = 1, #repos do
+        -- Make sure all of the variables are set.
+        helper_functions.check_variables(repos[i])
+
+        -- Adjust directory if possible.
+        repos[i].dir = helper_functions.adjust_dir(repos[i].dir)
+
         -- Create the given directory if it does not exist.
         os.execute("mkdir -p " .. repos[i].dir)
 
@@ -51,9 +57,6 @@ local function clone_repos()
             print("Warning: " .. repos[i].dir .. repos[i].name .. " already exists. Skipping.")
             goto continue
         end
-
-        -- Make sure all of the variables are set.
-        helper_functions.check_variables(repos[i])
 
         -- Get the default branch.
         branch = helper_functions.get_def_branch(repos[i]) or ""

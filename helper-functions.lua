@@ -17,6 +17,25 @@
 -- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 --
 
+--- @brief Checks if the specified directory of
+--- the repository is properly set. If not, the
+--- function will attempt to fix it.
+--- @param repo_dir string The repository's directory.
+--- @return the adjusted directory string
+local function adjust_dir(repo_dir)
+    -- Does the variable include `/` at the end?
+    if repo_dir:sub(-1) ~= "/" then
+       repo_dir = repo_dir .. "/"
+    end
+
+    -- Does the variable have a dot at the beginning followed by a slash?
+    if repo_dir:sub(1, 2) == "./" then
+        repo_dir = repo_dir:gsub("./", "")
+    end
+
+    return repo_dir
+end
+
 --- @brief Verifies that all of the necessary variables
 --- all set for all repositories. If not, the script will fail.
 --- @param repo table The table containing all of the repositories.
@@ -148,5 +167,6 @@ end
 return {
     check_variables = check_variables,
     get_def_branch = get_def_branch,
-    get_repo_branches = get_repo_branches
+    get_repo_branches = get_repo_branches,
+    adjust_dir = adjust_dir
 }
