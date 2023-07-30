@@ -52,7 +52,7 @@ local commit_message
 if arg[4] ~= nil then
     commit_message = arg[4]
 else
-    commit_message = "Bump repositories to their latest version"
+    commit_message = 'Bump repositories to their latest version'
 end
 
 --- @brief Updates all the repositories by
@@ -110,7 +110,7 @@ local function update_repos()
             os.execute("git config --local user.name github-actions[bot]")
             os.execute("git config --local user.email 'github-actions@users.noreply.github.com'")
 
-            os.execute("git commit -m \"Bump `" .. repos[i].name .. "` to its latest commit\"")
+            os.execute("git commit -m 'Bump `" .. repos[i].name .. "` to its latest commit'")
         end
 
         if one_pr == "false" and squash_commits == "false" then
@@ -121,7 +121,7 @@ local function update_repos()
     end
 
     if squash_commits == "true" and one_pr == "true" then
-        os.execute("git commit -m \"" .. commit_message .. "\"")
+        os.execute("git commit -m '" .. commit_message .. "'")
     end
 end
 

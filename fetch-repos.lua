@@ -71,7 +71,7 @@ local function clone_repos()
             os.execute("git config --local user.name github-actions[bot]")
             os.execute("git config --local user.email 'github-actions@users.noreply.github.com'")
 
-            os.execute("git commit -m \"Add " .. repos[i].name .. ".\"")
+            os.execute("git commit -m 'Add " .. repos[i].name .. "'")
         end
 
         ::continue::
@@ -82,7 +82,7 @@ local function clone_repos()
         os.execute("git config --local user.name github-actions[bot]")
         os.execute("git config --local user.email 'github-actions@users.noreply.github.com'")
 
-        os.execute("git commit -m \"" .. arg[3] .. "\"")
+        os.execute("git commit -m '" .. arg[3] .. "'")
     end
 end
 

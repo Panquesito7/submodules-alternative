@@ -20,11 +20,11 @@ inputs:
   commit_message:
     description: "The commit/PR message to use when adding new repositories."
     required: false
-    default: "Add the given repositories"
+    default: 'Add the given repositories'
   commit_message_update:
     description: "The commit/PR message to use when updating all the repositories."
     required: false
-    default: "Bump repositories to their latest version"
+    default: 'Bump repositories to their latest version'
   add_repos:
     description: "Runs the `fetch-repos` script if enabled to clone all the repositories."
     required: true
@@ -131,13 +131,13 @@ runs:
       shell: bash
       run: |
         if [[ ${{ inputs.add_repos }} == true ]]; then
-          lua fetch-repos.lua ${{ inputs.repos_filename }} ${{ inputs.squash_commits }} "${{ inputs.commit_message }}"
+          lua fetch-repos.lua ${{ inputs.repos_filename }} ${{ inputs.squash_commits }} '${{ inputs.commit_message }}'
         fi
     - name: Update repositories script
       shell: bash
       run: |
         if [[ ${{ inputs.update_repos }} == true ]]; then
-          lua update-repos.lua ${{ inputs.repos_filename }} ${{ inputs.squash_commits }} ${{ inputs.one_pr }} "${{ inputs.commit_message_update }}"
+          lua update-repos.lua ${{ inputs.repos_filename }} ${{ inputs.squash_commits }} ${{ inputs.one_pr }} '${{ inputs.commit_message_update }}'
         fi
     - name: Push changes and create PR
       shell: bash
