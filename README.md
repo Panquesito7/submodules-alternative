@@ -9,7 +9,7 @@ An easy-to-use Git (Sub)modules alternative to make the cloning process easier.\
 
 - Cloning repositories is now super easier: anyone can clone your repository **without the need for Git**. No more `clone recursive` or `submodule update` commands!
 - Subtree addition/update is automated by GitHub Actions (if desired), making it easier to integrate into your projects.
-- Lightweight and documented codebase in [Lua](https://www.lua.org/) v5.3.3.
+- Lightweight and documented codebase written in [Lua](https://www.lua.org/) v5.3.3.
 - Git Submodules can sometimes be messy or confusing, which this tool aims to solve.
 - Lets you choose the desired branch of the repository, unlike Git Submodules which automatically chooses the default branch.
 - Easily take a look at the changes **directly in the PR** without extra effort. Git Submodules changes cannot be seen via the PR diff.
@@ -79,14 +79,16 @@ jobs:
           repos_filename: repos                       # In case your file is named `repos.lua`, you can leave it as `repos`.
           use_pr: true                                # Whether to create a pull request when updating/adding the repositories.
           branch_name: repo-update                    # The branch name to use (only if `use_pr` is enabled).
-          commit_message: "Update"                    # Commit message used when adding new repositories.
-          commit_message_update: "Bump repositories"  # Commit message used when updating all the repositories.
+          commit_message: 'Update'                    # Commit message used when adding new repositories.
+          commit_message_update: 'Bump repositories'  # Commit message used when updating all the repositories.
           add_repos: false                            # If enabled, this will clone all the repositories listed in your repos file.
           update_repos: true                          # When enabled, this will attempt to update all the repositories.
           squash_commits: false                       # Whether to squash all commits or not on every repository update/addition. Cannot be used if `one_pr` is disabled.
           one_pr: false                               # Creates one single PR for everything if enabled. Works only for `update_repos` if disabled.
           delete_existing_branches: true              # Deletes the branches that updated the subtrees. Note that this is done only on action run, not on immediate PR merge.
 ```
+
+**Always use single-quoting for commit messages if you want to include special symbols such as `!`.**
 
 If `delete_existing_branches` is enabled, it will attempt to delete the branches before running the scripts to ensure there are no merge conflicts.\
 However, this is not the most efficient way of deleting the branches. These are other alternatives I recommend:
@@ -121,6 +123,8 @@ lua fetch-repos.lua <repos_filename> <squash_commits> <commit_message> # No file
 ```bash
 git push
 ```
+
+**Please note that commit messages should include quoting (`''` or `""`), else, the script will detect it as multiple parameters.**
 
 3. Done! All of your repositories are now available in your project and can be updated later on. 🎉
 
