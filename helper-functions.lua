@@ -17,20 +17,37 @@
 -- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 --
 
+--- @brief Whether the user is on Windows or not.
+--- @return the given operating system
+local function is_on_windows()
+    return package.config:sub(1, 1) == "\\"
+end
+
 --- @brief Checks if the specified directory of
 --- the repository is properly set. If not, the
 --- function will attempt to fix it.
 --- @param repo_dir string The repository's directory.
 --- @return the adjusted directory string
 local function adjust_dir(repo_dir)
-    -- Does the variable have a `./` at the beginning?
-    if repo_dir:sub(1, 2) == "./" then
-        repo_dir = repo_dir:sub(3)
-    end
+    -- Windows directories work differently from Linux.
+    if is_on_windows() then
+        -- Does the variable have a `./` at the beginning?
+        if repo_dir:sub(1, 2) == ".\\" then
+            repo_dir = repo_dir:sub(3)
+        end
 
-    -- Does the variable include `/` at the end?
-    if repo_dir:sub(-1) ~= "/" then
-       repo_dir = repo_dir .. "/"
+        -- Does the variable include `/` at the end?
+        if repo_dir:sub(-1) ~= "\\" then
+            repo_dir = repo_dir .. "\\"
+        end
+    else
+        if repo_dir:sub(1, 2) == "./" then
+            repo_dir = repo_dir:sub(3)
+        end
+
+        if repo_dir:sub(-1) ~= "/" then
+            repo_dir = repo_dir .. "/"
+        end
     end
 
     return repo_dir
@@ -80,14 +97,30 @@ local function get_def_branch(repo)
     -- Currently supports: GitLab, GitHub, and BitBucket.
     local handle
 
-    -- Is branch already defined? Do not waste API requests.
+    -- Is the branch already defined? Do not waste limited API requests.
     if repo.def_branch ~= nil then
         return repo.def_branch
     end -- Continue otherwise.
 
+    local function get_branch_bitsadmin(command)
+        local temp_file = os.getenv("TEMP") .. "\\github.json"
+        io.popen("bitsadmin /transfer myDownloadJob /download /priority normal " .. command .. temp_file .. "\"")
+        local file = io.open(temp_file, "r")
+        local content = file:read("*all")
+        file:close()
+        local json = require("json")
+        local data = json.decode(content)
+
+        repo.def_branch = data.default_branch
+    end
+
     if vcs == "github" then
-        handle = io.popen("wget -q -O - \"\"https://api.github.com/repos/" .. owner .. "/" .. repo_url .. "\"\" | jq -r '.default_branch'")
-         if handle then
+        if is_on_windows() then
+            get_branch_bitsadmin("\"https://api.github.com/repos/" .. owner .. "/" .. repo_url .. "\" \"")
+        else
+            handle = io.popen("wget -q -O - \"\"https://api.github.com/repos/" .. owner .. "/" .. repo_url .. "\"\" | jq -r '.default_branch'")
+        end
+        if handle then
             -- Print message and update branch only if default branch not set.
             if repo.def_branch == nil then
                 branch = handle:read("*a")
@@ -103,7 +136,11 @@ local function get_def_branch(repo)
             return nil
         end
     elseif vcs == "gitlab" then
-        handle = io.popen("wget -q -O - \"\"https://gitlab.com/api/v4/projects/" .. owner .. "%2F" .. repo_url .. "\"\" | jq -r '.default_branch'")
+        if is_on_windows() then
+            get_branch_bitsadmin("\"https://gitlab.com/api/v4/projects/" .. owner .. "%2F" .. repo_url .. "\" \"")
+        else
+            handle = io.popen("wget -q -O - \"\"https://gitlab.com/api/v4/projects/" .. owner .. "%2F" .. repo_url .. "\"\" | jq -r '.default_branch'")
+        end
         if handle then
             -- Print message and update branch only if default branch not set.
             if repo.def_branch == nil then
@@ -120,7 +157,11 @@ local function get_def_branch(repo)
             return nil
         end
     elseif vcs == "bitbucket" then
-        handle = io.popen("wget -q -O - \"\"https://api.bitbucket.org/2.0/repositories/" .. owner .. "/" .. repo_url .. "\"\" | jq -r '.mainbranch.name'")
+        if is_on_windows() then
+            get_branch_bitsadmin("\"https://api.bitbucket.org/2.0/repositories/" .. owner .. "/" .. repo_url .. "\" \"")
+        else
+            handle = io.popen("wget -q -O - \"\"https://api.bitbucket.org/2.0/repositories/" .. owner .. "/" .. repo_url .. "\"\" | jq -r '.mainbranch.name'")
+        end
         if handle then
             -- Print message and update branch only if default branch not set.
             if repo.def_branch == nil then

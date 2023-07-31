@@ -107,9 +107,11 @@ For more information about Cron, you can check [CronHub](https://crontab.cronhub
 > **Note**
 >
 > You will need to install Lua v5.3.3 in your\
-> machine in case you do not have it installed.
+> machine in case you do not have it installed.\
+> Git Software is also required to run a few commands.
 >
-> Download: <https://www.lua.org/download.html>
+> Download Lua: <https://www.lua.org/download.html>\
+> Download Git Software: <https://git-scm.com/downloads>
 >
 > **Both `fetch-repos.lua` and `update-repos.lua` require\
 > `helper-functions.lua` for extra functions and safety checks.**
