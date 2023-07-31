@@ -53,7 +53,10 @@ local function clone_repos()
         os.execute("mkdir -p " .. repos[i].dir)
 
         -- Make sure the repository is not cloned already.
-        if os.execute("test -d " .. repos[i].dir .. repos[i].name) then
+        local command = (helper_functions.is_on_windows() == false and "test -d " .. repos[i].dir .. repos[i].name)
+        or "if exist " .. repos[i].dir .. repos[i].name .. " (exit 1) else (exit 0)"
+
+        if os.execute(command) then
             print("Warning: " .. repos[i].dir .. repos[i].name .. " already exists. Skipping.")
             goto continue
         end
