@@ -23,14 +23,14 @@
 --- @param repo_dir string The repository's directory.
 --- @return the adjusted directory string
 local function adjust_dir(repo_dir)
+    -- Does the variable have a `./` at the beginning?
+    if repo_dir:sub(1, 2) == "./" then
+        repo_dir = repo_dir:sub(3)
+    end
+
     -- Does the variable include `/` at the end?
     if repo_dir:sub(-1) ~= "/" then
        repo_dir = repo_dir .. "/"
-    end
-
-    -- Does the variable have a dot at the beginning followed by a slash?
-    if repo_dir:sub(1, 2) == "./" then
-        repo_dir = repo_dir:gsub("./", "")
     end
 
     return repo_dir
