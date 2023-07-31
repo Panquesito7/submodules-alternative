@@ -72,6 +72,9 @@ local function check_variables(repo)
     if repo.dir == nil then
         print("Error: `dir` is not set for repository `" .. repo.name .. "`.")
         os.exit(1)
+    else
+        -- Attempt to adjust the directory.
+        adjust_dir(repo.dir)
     end
 
     if repo.def_branch == nil then
@@ -90,8 +93,10 @@ local function get_def_branch(repo)
     local vcs = repo.url:match("https://(%w+).%w+")
     local owner, repo_url = repo.url:match(vcs .. ".%w+/(.+)/(.+)")
 
-    -- Remove `.git` from `repo` if available.
-    repo_url = repo_url:gsub(".git", "")
+    -- Remove `.git` from `repo` at the very end if available.
+    if repo_url:sub(-4) == ".git" then
+        repo_url = repo_url:sub(1, -5)
+    end
 
     -- Attempt to obtain the default branch name from the given URL.
     -- Currently supports: GitLab, GitHub, and BitBucket.

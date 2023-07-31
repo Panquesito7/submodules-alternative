@@ -46,9 +46,6 @@ local function clone_repos()
         -- Make sure all of the variables are set.
         helper_functions.check_variables(repos[i])
 
-        -- Adjust directory if possible.
-        repos[i].dir = helper_functions.adjust_dir(repos[i].dir)
-
         -- Create the given directory if it does not exist.
         os.execute("mkdir -p " .. repos[i].dir)
 

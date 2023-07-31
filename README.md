@@ -20,7 +20,6 @@ An easy-to-use Git (Sub)modules alternative to make the cloning process easier.\
 1. Create a new file named `repos.lua` (or as you desire) with all your selected repositories ([template](https://github.com/Panquesito7/submodules-alternative/blob/main/repos-template.lua) file).
 
 Your `repos.lua` file should look similar to the following.\
-**It is recommended to not include `.git` at the end of URLs for various settings on the script.**
 
 ```lua
 local repos = {

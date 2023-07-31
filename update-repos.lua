@@ -64,9 +64,6 @@ local function update_repos()
         -- Make sure all of the variables are set.
         helper_functions.check_variables(repos[i])
 
-        -- Adjust directory if possible.
-        repos[i].dir = helper_functions.adjust_dir(repos[i].dir)
-
         -- Make sure the repository is cloned already.
         local command = (helper_functions.is_on_windows() == false and "test -d " .. repos[i].dir .. repos[i].name)
         or "if exist " .. repos[i].dir .. repos[i].name .. " (exit 1) else (exit 0)"
