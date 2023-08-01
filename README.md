@@ -1,5 +1,8 @@
 # Submodules Alternative
 
+[![Verify that the script works](https://github.com/Panquesito7/submodules-alternative/actions/workflows/test-script.yml/badge.svg)](https://github.com/Panquesito7/submodules-alternative/actions/workflows/test-script.yml)
+[![LuaCheck](https://github.com/Panquesito7/submodules-alternative/actions/workflows/luacheck.yml/badge.svg)](https://github.com/Panquesito7/submodules-alternative/actions/workflows/luacheck.yml)
+
 [![Submodules Alternative](https://socialify.git.ci/Panquesito7/submodules-alternative/image?description=1&descriptionEditable=Easy-to-use%20Git%20modules%20alternative&font=Source%20Code%20Pro&issues=1&language=1&name=1&owner=1&pattern=Circuit%20Board&stargazers=1&theme=Auto)](https://github.com/Panquesito7/submodules-alternative)
 
 An easy-to-use Git (Sub)modules alternative to make the cloning process easier.\
