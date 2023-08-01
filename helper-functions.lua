@@ -214,5 +214,6 @@ return {
     check_variables = check_variables,
     get_def_branch = get_def_branch,
     get_repo_branches = get_repo_branches,
-    adjust_dir = adjust_dir
+    adjust_dir = adjust_dir,
+    is_on_windows = is_on_windows
 }
