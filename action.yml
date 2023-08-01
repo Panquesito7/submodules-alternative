@@ -45,6 +45,14 @@ inputs:
     description: "Deletes the branches that updated the subtrees. Note that this is done only on action run, not on immediate PR merge."
     required: false
     default: "true"
+  pr_label_fetch:
+    description: "The label to use when creating a PR (fetching repositories). Supports only one label for now."
+    required: false
+    default: "repo-fetch"
+  pr_label_update:
+    description: "The label to use when creating a PR (updating subtrees). Supports only one label for now."
+    required: false
+    default: "dependencies"
 runs:
   using: "composite"
   steps:
@@ -145,20 +153,20 @@ runs:
         if [[ ${{ inputs.use_pr }} == true ]]; then
           if [[ ${{ inputs.one_pr }} == true ]]; then
             git push origin ${{ inputs.branch_name }}:${{ inputs.branch_name }} || true
-            gh pr create --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} --title '${{ inputs.commit_message }}' --body 'Repositories were added or updated using the Submodules Alternative tool.' || true
+            gh pr create --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} --title '${{ inputs.commit_message }}' --body 'Repositories were added or updated using the Submodules Alternative tool.' --label '${{ inputs.pr_label_update }}' || true
           else
             # The One PR option is not available when adding the repositories.
             if [[ ${{ inputs.add_repos }} == true ]]; then
               git checkout ${{ inputs.branch_name }} || true
 
               git push origin ${{ inputs.branch_name }}:${{ inputs.branch_name }} || true
-              gh pr create --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} --title '${{ inputs.commit_message }}' --body 'Repositories were added or updated using the Submodules Alternative tool.' || true
+              gh pr create --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} --title '${{ inputs.commit_message }}' --body 'Repositories were added or updated using the Submodules Alternative tool.' --label '${{ inputs.pr_label_fetch }}' || true
             else # The `add_repos` option is disabled.
               branches=$(lua -e 'local repos = require("${{ inputs.repos_filename }}").repos; dofile("helper-functions.lua"); get_repo_branches(repos)')
 
               for branch in ${branches[@]}; do
                 repo_name=${branch%-update}
-                gh pr create --base ${GITHUB_REF##*/} --head $branch --title 'Bump `'$repo_name'` to its latest commit' --body 'The repository `'$repo_name'` was updated to its latest commit.' || true
+                gh pr create --base ${GITHUB_REF##*/} --head $branch --title 'Bump `'$repo_name'` to its latest commit' --body 'The repository `'$repo_name'` was updated to its latest commit.' --label '${{ inputs.pr_label_update }}' || true
               done
             fi
           fi
