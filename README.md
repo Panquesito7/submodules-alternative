@@ -6,7 +6,7 @@
 [![Submodules Alternative](https://socialify.git.ci/Panquesito7/submodules-alternative/image?description=1&descriptionEditable=Easy-to-use%20Git%20modules%20alternative&font=Source%20Code%20Pro&issues=1&language=1&name=1&owner=1&pattern=Circuit%20Board&stargazers=1&theme=Auto)](https://github.com/Panquesito7/submodules-alternative)
 
 An easy-to-use Git (Sub)modules alternative to make the cloning process easier.\
-**The project is still WIP and still contains bugs. It is recommended to use in small projects until the tool is fairly stable.**
+**The project is still WIP and still contains bugs. It is recommended to use it in small projects until the tool is fairly stable.**
 
 ## What's the difference?
 
@@ -20,7 +20,7 @@ An easy-to-use Git (Sub)modules alternative to make the cloning process easier.\
 
 ## Usage
 
-1. Create a new file named `repos.lua` (or as you desire) with all your selected repositories ([template](https://github.com/Panquesito7/submodules-alternative/blob/main/repos-template.lua) file).
+1. Create a new file named `repos.lua` (or as you desire) with all your selected repositories ([template](https://github.com/Panquesito7/submodules-alternative/blob/main/repos-template.lua) file). You can place it in any directory, just make sure to specify the directory in your workflow (see the next step).
 
 Your `repos.lua` file should look similar to the following.
 
@@ -69,6 +69,7 @@ on:
   #        │  │ │ │ │
   #        *  * * * *
   - cron: '0 0 * * 1' # This would run weekly on Monday at 00:00 UTC
+  workflow_dispatch: # This allows you to manually run the workflow whenever you want.
 jobs:
   update-repos:
     runs-on: ubuntu-latest
@@ -76,7 +77,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0 # This pulls changes before doing any changes
-      - uses: Panquesito7/submodules-alternative@v1.5.7
+      - uses: Panquesito7/submodules-alternative@v1.6.0
         with:
           repos_filename: repos                       # In case your file is named `repos.lua`, you can leave it as `repos`.
           use_pr: true                                # Whether to create a pull request when updating/adding the repositories.
