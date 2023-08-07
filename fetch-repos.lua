@@ -24,6 +24,10 @@
     [3]: Commit message that's being used. Only if the squash commits option is enabled.
 --]]
 
+if os.getenv("GITHUB_ACTION_PATH") ~= nil then
+    package.path = os.getenv("GITHUB_ACTION_PATH") .. "/?.lua;" .. package.path
+end
+
 local data = require(arg[1])
 local repos = data.repos
 local helper_functions = require("helper-functions")
