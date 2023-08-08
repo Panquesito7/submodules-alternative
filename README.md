@@ -25,6 +25,11 @@ An easy-to-use Git (Sub)modules alternative to make the cloning process easier.\
 Your `repos.lua` file should look similar to the following.
 
 ```lua
+local config = {
+    labels_fetch = "repo-fetch,dependencies"
+    labels_update = "dependencies"
+}
+
 local repos = {
     {
         name = "opencv",
@@ -44,9 +49,10 @@ local repos = {
     }
 }
 
--- Fully needed, so that the scripts can access the repositories.
+-- Fully needed, so that the scripts can access the configurations.
 return {
-    repos = repos
+    repos = repos,
+    config = config
 }
 ```
 

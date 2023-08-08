@@ -1,5 +1,9 @@
 -- USED FOR TESTING PURPOSES ONLY.
 
+local config = {
+    labels_update = "dependencies,enhancement"
+}
+
 local repos = {
     {
         name = "Minetest-WorldEdit",
@@ -25,5 +29,6 @@ local repos = {
 }
 
 return {
-    repos = repos
+    repos = repos,
+    config = config
 }

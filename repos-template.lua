@@ -1,3 +1,8 @@
+local config = {
+    labels_fetch = "repos-fetch,dependencies",       -- Labels that will be added to the PRs when the `fetch-repos.lua` script is run, separated by commas in the same string(!).
+    labels_update = "dependencies",                  -- Labels that will be added to the PRs when running the `update-repos.lua` script, separated by commas in the same string(!).
+}
+
 local repos = {
     {
         name = "",            -- Name of the repository, used as directory name as well.
@@ -10,5 +15,6 @@ local repos = {
 }
 
 return {
-    repos = repos
+    repos = repos,
+    config = config
 }
