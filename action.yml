@@ -129,7 +129,7 @@ runs:
         if [[ ${{ inputs.use_pr }} == true ]]; then
           if [[ ${{ inputs.one_pr }} == true ]]; then
             git push origin ${{ inputs.branch_name }}:${{ inputs.branch_name }} || true
-            gh pr create --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} --title '${{ inputs.commit_message }}' --body 'Repositories were added or updated using the Submodules Alternative tool.' --label '${{ inputs.pr_label_update }}' || true
+            gh pr create --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} --title '${{ inputs.commit_message }}' --body 'Repositories were added or updated using the Submodules Alternative tool.' || true
           else
             # The One PR option is not available when adding the repositories.
             if [[ ${{ inputs.add_repos }} == true ]]; then
@@ -137,13 +137,13 @@ runs:
               git push origin ${{ inputs.branch_name }}:${{ inputs.branch_name }} || true
 
               pr_number=$(gh pr list --base ${GITHUB_REF##*/} --head $branch | grep -oP '(?<=#)[0-9]+')
-              labels_fetch=$(lua -e 'local labels = require("${{ inputs.repos_filename }}").config; if labels.labels_fetch then print(labels.labels_fetch) end')
+              labels_fetch=$(lua -e 'local labels = require("${{ inputs.repos_filename }}").config; if labels.labels_fetch then print(labels.labels_fetch) end') || "repo-fetch,dependencies"
 
               gh pr create --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} --title '${{ inputs.commit_message }}' --body 'Repositories were added or updated using the Submodules Alternative tool.' || true
               gh pr edit $pr_number --add-label $labels_fetch || true
             else # The `add_repos` option is disabled.
               branches=$(lua -e 'local repos = require("${{ inputs.repos_filename }}").repos; dofile("${{ github.action_path }}/helper-functions.lua"); get_repo_branches(repos)')
-              labels_update=$(lua -e 'local labels = require("${{ inputs.repos_filename }}").config; if labels.labels_update then print(labels.labels_update) end')
+              labels_update=$(lua -e 'local labels = require("${{ inputs.repos_filename }}").config; if labels.labels_update then print(labels.labels_update) end') || "dependencies"
 
               for branch in ${branches[@]}; do
                 repo_name=${branch%-update}
