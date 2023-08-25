@@ -136,12 +136,13 @@ runs:
               git checkout ${{ inputs.branch_name }} || true
               git push origin ${{ inputs.branch_name }}:${{ inputs.branch_name }} || true
 
-              pr_number=$(gh pr list --base ${GITHUB_REF##*/} --head $branch | grep -oP '(?<=#)[0-9]+')
+              pr=$(gh pr list --base ${GITHUB_REF##*/} --head $branch)
+              pr_number=$(echo $pr | cut -d ' ' -f 1)
+
               labels_fetch=$(lua -e 'local labels = require("${{ inputs.repos_filename }}").config; if labels.labels_fetch then print(labels.labels_fetch) end') || "repo-fetch,dependencies"
 
               gh pr create --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} --title '${{ inputs.commit_message }}' --body 'Repositories were added or updated using the Submodules Alternative tool.' || true
 
-              # Was the PR created? If not, do not add anything.
               if [[ $(gh pr list --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} | grep -oP '(?<=#)[0-9]+') ]]; then
                 gh pr edit $pr_number --add-label $labels_fetch || true
               fi
@@ -153,11 +154,11 @@ runs:
                 repo_name=${branch%-update}
                 gh pr create --base ${GITHUB_REF##*/} --head $branch --title 'Bump `'$repo_name'` to its latest commit' --body 'The repository `'$repo_name'` was updated to its latest commit.' || true
 
-                # Was the PR created? If not, do not add anything.
-
                 if [[ $(gh pr list --base ${GITHUB_REF##*/} --head $branch | grep -oP '(?<=#)[0-9]+') ]]; then
-                  pr_number=$(gh pr list --base ${GITHUB_REF##*/} --head $branch | grep -oP '(?<=#)[0-9]+')
-                  gh pr edit $pr_number --add-label $labels_update || true
+                  pr=$(gh pr list --base ${GITHUB_REF##*/} --head $branch)
+                  pr_number=$(echo $pr | cut -d ' ' -f 1)
+
+                  gh pr edit $pr_number --add-label "$labels_update" || true
                 fi
               done
             fi
