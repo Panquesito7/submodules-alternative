@@ -140,7 +140,11 @@ runs:
               labels_fetch=$(lua -e 'local labels = require("${{ inputs.repos_filename }}").config; if labels.labels_fetch then print(labels.labels_fetch) end') || "repo-fetch,dependencies"
 
               gh pr create --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} --title '${{ inputs.commit_message }}' --body 'Repositories were added or updated using the Submodules Alternative tool.' || true
-              gh pr edit $pr_number --add-label $labels_fetch || true
+
+              # Was the PR created? If not, do not add anything.
+              if [[ $(gh pr list --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} | grep -oP '(?<=#)[0-9]+') ]]; then
+                gh pr edit $pr_number --add-label $labels_fetch || true
+              fi
             else # The `add_repos` option is disabled.
               branches=$(lua -e 'local repos = require("${{ inputs.repos_filename }}").repos; dofile("${{ github.action_path }}/helper-functions.lua"); get_repo_branches(repos)')
               labels_update=$(lua -e 'local labels = require("${{ inputs.repos_filename }}").config; if labels.labels_update then print(labels.labels_update) end') || "dependencies"
@@ -149,8 +153,12 @@ runs:
                 repo_name=${branch%-update}
                 gh pr create --base ${GITHUB_REF##*/} --head $branch --title 'Bump `'$repo_name'` to its latest commit' --body 'The repository `'$repo_name'` was updated to its latest commit.' || true
 
-                pr_number=$(gh pr list --base ${GITHUB_REF##*/} --head $branch | grep -oP '(?<=#)[0-9]+')
-                gh pr edit $pr_number --add-label $labels_update || true
+                # Was the PR created? If not, do not add anything.
+
+                if [[ $(gh pr list --base ${GITHUB_REF##*/} --head $branch | grep -oP '(?<=#)[0-9]+') ]]; then
+                  pr_number=$(gh pr list --base ${GITHUB_REF##*/} --head $branch | grep -oP '(?<=#)[0-9]+')
+                  gh pr edit $pr_number --add-label $labels_update || true
+                fi
               done
             fi
           fi
