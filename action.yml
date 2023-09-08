@@ -129,7 +129,7 @@ runs:
         if [[ ${{ inputs.use_pr }} == true ]]; then
           if [[ ${{ inputs.one_pr }} == true ]]; then
             git push origin ${{ inputs.branch_name }}:${{ inputs.branch_name }} || true
-            gh pr create --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} --title '${{ inputs.commit_message }}' --body 'Repositories were added or updated using the Submodules Alternative tool.' || true
+            gh pr create --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} --title '${{ inputs.commit_message }}' --body "$(lua -e 'local config = require("${{ inputs.repos_filename }}").config; if config.both then print(config.both) else print("Repositories were added or updated using the Submodules Alternative tool.") end')" || true
           else
             # The One PR option is not available when adding the repositories.
             if [[ ${{ inputs.add_repos }} == true ]]; then
@@ -140,8 +140,7 @@ runs:
               pr_number=$(echo $pr | cut -d ' ' -f 1)
 
               labels_fetch=$(lua -e 'local labels = require("${{ inputs.repos_filename }}").config; if labels.labels_fetch then print(labels.labels_fetch) end') || "repo-fetch,dependencies"
-
-              gh pr create --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} --title '${{ inputs.commit_message }}' --body 'Repositories were added or updated using the Submodules Alternative tool.' || true
+              gh pr create --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} --title '${{ inputs.commit_message }}' --body "$(lua -e 'local config = require("${{ inputs.repos_filename }}").config; if config.fetch then print(config.fetch) else print("Repositories were added or updated using the Submodules Alternative tool.") end')" || true
 
               if [[ $(gh pr list --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }}) ]]; then
                 gh pr edit $pr_number --add-label $labels_fetch || true
@@ -152,7 +151,7 @@ runs:
 
               for branch in ${branches[@]}; do
                 repo_name=${branch%-update}
-                gh pr create --base ${GITHUB_REF##*/} --head $branch --title 'Bump `'$repo_name'` to its latest commit' --body 'The repository `'$repo_name'` was updated to its latest commit.' || true
+                gh pr create --base ${GITHUB_REF##*/} --head $branch --title 'Bump `'$repo_name'` to its latest commit' --body "$(lua -e 'local config = require("${{ inputs.repos_filename }}").config; if config.update then print(config.update) else print('The subtree `'$repo_name'` to its latest commit') end')
 
                 if [[ $(gh pr list --base ${GITHUB_REF##*/} --head $branch) ]]; then
                   pr=$(gh pr list --base ${GITHUB_REF##*/} --head $branch)
