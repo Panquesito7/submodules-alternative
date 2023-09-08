@@ -1,7 +1,16 @@
 -- USED FOR TESTING PURPOSES ONLY.
 
 local config = {
-    labels_update = "dependencies,enhancement"
+    labels_update = "dependencies,enhancement",
+    pr_body = {
+        update =
+            "This is a PR that updated the subtrees.\n" ..
+            "Updated submodules are:" ..
+            "- Test 1." ..
+            "- Test2. ",
+        fetch = "This is a PR that fetched all the subtrees specified in `repos.lua`",
+        both = "This is a PR that both updated and fetched the subtrees."
+    }
 }
 
 local repos = {
