@@ -151,7 +151,7 @@ runs:
 
               for branch in ${branches[@]}; do
                 repo_name=${branch%-update}
-                gh pr create --base ${GITHUB_REF##*/} --head $branch --title 'Bump `'$repo_name'` to its latest commit' --body "$(lua -e 'local config = require("${{ inputs.repos_filename }}").config; if config.update then print(config.update) else print('The subtree `'$repo_name'` to its latest commit') end')
+                gh pr create --base ${GITHUB_REF##*/} --head $branch --title 'Bump `'$repo_name'` to its latest commit' --body "$(lua -e 'local config = require("${{ inputs.repos_filename }}").config; if config.update then print(config.update) else print('The subtree `'$repo_name'` to its latest commit') end')"
 
                 if [[ $(gh pr list --base ${GITHUB_REF##*/} --head $branch) ]]; then
                   pr=$(gh pr list --base ${GITHUB_REF##*/} --head $branch)
