@@ -4,10 +4,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: Panquesito7/submodules-alternative@dev
+      - uses: Panquesito7/submodules-alternative@main
         with:
           repos_filename: repos-test
           use_pr: true
