@@ -1,0 +1,9 @@
+"""
+The following subtrees were updated:
+
+{updated_subtrees}
+New subtrees were added:
+
+{added_subtrees}
+For more information on how the tool works, please check [our repository](https://github.com/Panquesito7/submodules-alternative).
+"""

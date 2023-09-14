@@ -16,7 +16,6 @@ An easy-to-use Git (Sub)modules alternative to make the cloning process easier.\
 - Git Submodules can sometimes be messy or confusing, which this tool aims to solve.
 - Lets you choose the desired branch of the repository, unlike Git Submodules which automatically chooses the default branch.
 - Easily take a look at the changes **directly in the PR** without extra effort. Git Submodules changes cannot be seen via the PR diff.
-- Provide a customizable PR body when fetching, updating, and doing the same actions.
 <!-- - Easily specify which files are ignored at the moment of updating the repositories. This is very useful if you want to modify a repository/submodule. -->
 
 ## Usage
@@ -29,14 +28,6 @@ Your `repos.lua` file should look similar to the following.
 local config = {
     labels_fetch = "repo-fetch,dependencies"
     labels_update = "dependencies",
-    pr_body = {
-      update = "This PR updated all the subtrees." ..
-          "The updated subtrees are:" ..
-          "- Test 1." ..
-          "- Test 2.",
-      fetch = "This PR fetched all the subtrees.",
-      both = "This PR both updates subtrees and fetches new ones."
-    }
 }
 
 local repos = {
@@ -92,7 +83,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0 # This pulls changes before doing any changes
-      - uses: Panquesito7/submodules-alternative@v1.6.0
+      - uses: Panquesito7/submodules-alternative@v1.6.1
         with:
           repos_filename: repos                       # In case your file is named `repos.lua`, you can leave it as `repos`.
           use_pr: true                                # Whether to create a pull request when updating/adding the repositories.

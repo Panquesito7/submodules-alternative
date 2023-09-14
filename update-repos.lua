@@ -97,6 +97,18 @@ local function update_repos()
         os.execute("git checkout --theirs " .. repos[i].dir .. repos[i].name)
         os.execute("git add " .. repos[i].dir .. repos[i].name)
 
+        local updated_repos = io.open("updated_repos.txt", "w+")
+        if updated_repos then
+            updated_repos:write("")
+            updated_repos:close()
+        end
+
+        updated_repos = io.open("updated_repos.txt", "a+")
+        if updated_repos then
+            updated_repos:write(repos[i].name .. "\n")
+            updated_repos:close()
+        end
+
         if one_pr == "false" then
             local default_branch = io.popen("git remote show origin | grep \"HEAD branch\" | cut -d' ' -f5"):read("*a")
 
@@ -130,6 +142,11 @@ local function update_repos()
     if squash_commits == "true" and one_pr == "true" then
         os.execute("git commit -m '" .. commit_message .. "'")
     end
+end
+
+local updated_repos = io.open("updated_repos.txt", "a+")
+if updated_repos then
+    updated_repos:write("\n")
 end
 
 -- Update all repositories.

@@ -127,11 +127,13 @@ runs:
       shell: bash
       run: |
         if [[ ${{ inputs.use_pr }} == true ]]; then
-          if [[ ${{ inputs.one_pr }} == true ]]; then
+          if [[ ${{ inputs.one_pr }} == true ]]; then # One PR for everything: fetching and updating.
             git push origin ${{ inputs.branch_name }}:${{ inputs.branch_name }} || true
-            gh pr create --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} --title '${{ inputs.commit_message }}' --body "$(lua -e 'local config = require("${{ inputs.repos_filename }}").config; if config.both then print(config.both) else print("Repositories were added or updated using the Submodules Alternative tool.") end')" || true
-          else
-            # The One PR option is not available when adding the repositories.
+
+            pr_body=$(bash ${{ github.action_path }}/markdown_pr_body.sh "all" "false"
+            gh pr create --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} --title '${{ inputs.commit_message }}' --body "$pr_body" || true
+          else # The One PR option is not available when adding the repositories.
+               # The code below creates one PR for fetching all the subtrees.
             if [[ ${{ inputs.add_repos }} == true ]]; then
               git checkout ${{ inputs.branch_name }} || true
               git push origin ${{ inputs.branch_name }}:${{ inputs.branch_name }} || true
@@ -139,19 +141,24 @@ runs:
               pr=$(gh pr list --base ${GITHUB_REF##*/} --head $branch)
               pr_number=$(echo $pr | cut -d ' ' -f 1)
 
+              pr_body=$(bash ${{ github.action_path }}/markdown_pr_body.sh "added" "false")
+
               labels_fetch=$(lua -e 'local labels = require("${{ inputs.repos_filename }}").config; if labels.labels_fetch then print(labels.labels_fetch) end') || "repo-fetch,dependencies"
               gh pr create --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} --title '${{ inputs.commit_message }}' --body "$(lua -e 'local config = require("${{ inputs.repos_filename }}").config; if config.fetch then print(config.fetch) else print("Repositories were added or updated using the Submodules Alternative tool.") end')" || true
 
               if [[ $(gh pr list --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }}) ]]; then
                 gh pr edit $pr_number --add-label $labels_fetch || true
               fi
-            else # The `add_repos` option is disabled.
+            elif [[ ${{ inputs.update_repos }} == true ]]; and [[ ${{ inputs.add_repos }} == false ]]; then
+              # The One PR option is available when updating the repositories.
               branches=$(lua -e 'local repos = require("${{ inputs.repos_filename }}").repos; dofile("${{ github.action_path }}/helper-functions.lua"); get_repo_branches(repos)')
               labels_update=$(lua -e 'local labels = require("${{ inputs.repos_filename }}").config; if labels.labels_update then print(labels.labels_update) end') || "dependencies"
 
               for branch in ${branches[@]}; do
                 repo_name=${branch%-update}
-                gh pr create --base ${GITHUB_REF##*/} --head $branch --title 'Bump `'$repo_name'` to its latest commit' --body "$(lua -e 'local config = require("${{ inputs.repos_filename }}").config; if config.update then print(config.update) else print('The subtree `'$repo_name'` to its latest commit') end')"
+                pr_body=$(bash ${{ github.action_path }}/markdown_pr_body.sh "updated" "true" $repo_name)
+
+                gh pr create --base ${GITHUB_REF##*/} --head $branch --title 'Bump `'$repo_name'` to its latest commit' --body "$pr_body" || true
 
                 if [[ $(gh pr list --base ${GITHUB_REF##*/} --head $branch) ]]; then
                   pr=$(gh pr list --base ${GITHUB_REF##*/} --head $branch)
