@@ -1,0 +1,6 @@
+"""
+The subtree {updated_subtree} was updated to its latest commit.
+See the diff. for all the changes that the updated subtree provided.
+
+For more information on how to use this tool and how it works, please check our [repository](https://github.com/Panquesito7/submodules-alternative).
+"""

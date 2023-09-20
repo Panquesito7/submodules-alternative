@@ -1,14 +1,6 @@
 local config = {
     labels_fetch = "repos-fetch,dependencies",       -- Labels that will be added to the PRs when the `fetch-repos.lua` script is run, separated by commas in the same string(!).
     labels_update = "dependencies",                  -- Labels that will be added to the PRs when running the `update-repos.lua` script, separated by commas in the same string(!).
-    pr_body = {                                      -- The body of the PRs that will be used. `both` is used when both actions are run in the same PR.
-        update = "This PR updated all the subtrees." ..
-            "The updated subtrees are:" ..
-            "- Test 1." ..
-            "- Test 2.",
-        fetch = "This PR fetched all the subtrees.",
-        both = "This PR both updates subtrees and fetches new ones."
-    }
 }
 
 local repos = {
