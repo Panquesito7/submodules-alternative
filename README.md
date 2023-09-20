@@ -16,6 +16,7 @@ An easy-to-use Git (Sub)modules alternative to make the cloning process easier.\
 - Git Submodules can sometimes be messy or confusing, which this tool aims to solve.
 - Lets you choose the desired branch of the repository, unlike Git Submodules which automatically chooses the default branch.
 - Easily take a look at the changes **directly in the PR** without extra effort. Git Submodules changes cannot be seen via the PR diff.
+- The scripts support both Linux (preferred) and Windows, which means that you can easily run the scripts on your machine or [Gitpod](https://www.gitpod.io) without using GitHub Actions.
 <!-- - Easily specify which files are ignored at the moment of updating the repositories. This is very useful if you want to modify a repository/submodule. -->
 
 ## Usage
@@ -80,7 +81,7 @@ jobs:
   update-repos:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # This pulls changes before doing any changes
       - uses: Panquesito7/submodules-alternative@v1.6.1
