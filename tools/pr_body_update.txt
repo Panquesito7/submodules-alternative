@@ -1,8 +1,6 @@
-"""
 This PR updated the following subtrees:
 
 {updated_subtrees}
 
 These subtrees have been set to their latest commit. You can see the full changes in the diff.
 For more information on how to use this tool and how it works, please check our [repository](https://github.com/Panquesito7/submodules-alternative).
-"""
