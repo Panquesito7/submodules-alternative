@@ -29,7 +29,7 @@ then
     added_subtrees_md=$(printf -- '- %s\\n' "${added_subtrees[@]}")
 
     # Creates a temporary file for the PR body
-    cat "$3/tools/pr_body.txt" > TEMP.txt
+    cat "$3/src/tools/pr_body.txt" > TEMP.txt
 
     if test -s updated_subtrees.txt;
     then
@@ -68,7 +68,7 @@ then
     updated_subtrees_md=$(printf -- '- %s\\n' "${updated_subtrees[@]}")
 
     # Creates a temporary file for the PR body
-    cat "$3/tools/pr_body_update.txt" > TEMP.txt
+    cat "$3/src/tools/pr_body_update.txt" > TEMP.txt
 
 elif [ "$1" == "added" ] && [ "$2" == "false" ];
 then
@@ -85,7 +85,7 @@ then
     added_subtrees_md=$(printf -- '- %s\\n' "${added_subtrees[@]}")
 
     # Creates a temporary file for the PR body
-    cat "$3/tools/pr_body_fetch.txt" > TEMP.txt
+    cat "$3/src/tools/pr_body_fetch.txt" > TEMP.txt
 
 elif [ "$1" != "all" ] && [ "$1" != "updated" ] && [ "$1" != "added" ]; then
     echo "Invalid mode. Available modes are: \"all\", \"updated\", \"added\""
@@ -95,7 +95,7 @@ fi
 if [ "$2" == "true" ] && [ "$1" == "updated" ];
 then
         # Creates a temporary file for the PR body
-        cat "$3/tools/pr_body_update_separate.txt" > TEMP.txt
+        cat "$3/src/tools/pr_body_update_separate.txt" > TEMP.txt
 
         # Add backticks around the subtree name
         updated_subtree="\\\`$4\\\`"
