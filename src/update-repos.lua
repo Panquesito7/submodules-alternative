@@ -28,7 +28,7 @@
 --]]
 
 if os.getenv("GITHUB_ACTION_PATH") ~= nil then
-    package.path = os.getenv("GITHUB_ACTION_PATH") .. "/?.lua;" .. package.path
+    package.path = os.getenv("GITHUB_ACTION_PATH") .. "/src/?.lua;" .. package.path
 end
 
 local data = require(arg[1])
