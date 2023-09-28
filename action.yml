@@ -141,14 +141,14 @@ runs:
               for branch in ${BRANCHES[@]}; do
                 # Obtain the PR body and adjust it to the updated subtree.
                 REPO_NAME=${branch%-update}
-                PR_BODY=$(bash ${{ github.action_path }}/src/tools/markdown_pr_body.sh "updated" "true" "${{ github.action_path }}" "$repo_name")
+                PR_BODY=$(bash ${{ github.action_path }}/src/tools/markdown_pr_body.sh "updated" "true" "${{ github.action_path }}" "$REPO_NAME")
 
                 # Create the PR with the given data.
-                gh pr create --base ${GITHUB_REF##*/} --head $branch --title 'Bump `'$repo_name'` to its latest commit' --body "$PR_BODY" || true
+                gh pr create --base ${GITHUB_REF##*/} --head $branch --title 'Bump `'$REPO_NAME'` to its latest commit' --body "$PR_BODY" || true
 
                 # Edit the newly created PR by adding the specific labels.
                 if [[ $(gh pr list --base ${GITHUB_REF##*/} --head $branch) ]]; then
-                  PR_NUMBER=$(bash ${{ github.action_path }}/src/tools/pr_number.sh ${GITHUB_REF##*/} "$branch")
+                  PR_NUMBER=$(bash ${{ github.action_path }}/src/tools/pr_number.sh ${GITHUB_REF##*/} $branch)
                   gh pr edit $PR_NUMBER --add-label "$LABELS_UPDATE" || true
                 fi
               done
