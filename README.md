@@ -84,7 +84,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # This pulls changes before doing any changes
-      - uses: Panquesito7/submodules-alternative@v1.6.1
+      - uses: Panquesito7/submodules-alternative@v1.7.0
         with:
           repos_filename: repos.lua                   # Both `repos.lua` and `repos` will work.
           use_pr: true                                # Whether to create a pull request when updating/adding the repositories.
