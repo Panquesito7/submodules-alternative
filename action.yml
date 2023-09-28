@@ -6,7 +6,7 @@ branding:
   color: purple
 inputs:
   repos_filename:
-    description: "The filename used to obtain the repository data (no file format is required)."
+    description: "The filename used to obtain the configuration and necessary repository data."
     required: true
     default: "repos"
   use_pr:
@@ -14,23 +14,23 @@ inputs:
     required: true
     default: "true"
   branch_name:
-    description: "The name of the branch to push to (only if `use_pr` is enabled)."
+    description: "The name of the branch to push to (only if `use_pr` is enabled). Not applicable when multiple PRs are created!"
     required: false
     default: "repo-update"
   commit_message:
-    description: "The commit/PR message to use when adding new repositories."
+    description: "The commit/PR message to use when adding new subtrees."
     required: false
-    default: 'Add the given repositories'
+    default: 'Add the given subtrees'
   commit_message_update:
-    description: "The commit/PR message to use when updating all the repositories."
+    description: "The commit/PR message to use when updating all the subtrees. Not applicable when multiple PRs are created!"
     required: false
-    default: 'Bump repositories to their latest version'
+    default: 'Bump subtrees to their latest version'
   add_repos:
-    description: "Runs the `fetch-repos` script if enabled to clone all the repositories."
+    description: "Runs the `fetch-repos` script if enabled to clone all the subtrees."
     required: true
     default: "false"
   update_repos:
-    description: "Whether to update the repositories or not."
+    description: "Whether to update the subtrees or not."
     required: true
     default: "true"
   squash_commits:
@@ -38,19 +38,17 @@ inputs:
     required: false
     default: "false"
   one_pr:
-    description: "Creates one single PR for updating all the repositories. This does not apply to the `fetch-repos` script. Doesn't work with `squash_commits`."
+    description: "Creates one single PR for updating all the subtrees. This does not apply to the `fetch-repos` script. Doesn't work together with `squash_commits`."
     required: false
     default: "false"
-  delete_existing_branches:
-    description: "Deletes the branches that updated the subtrees. Note that this is done only on action run, not on immediate PR merge."
-    required: false
-    default: "true"
 runs:
   using: "composite"
   steps:
-    - name: Make sure the configuration is valid
+    - name: Make sure the configurations are valid
       shell: bash
       run: |
+        repos_filename="$repos_filename"
+
         if [[ ${{ inputs.add_repos }} == false ]] && [[ ${{ inputs.update_repos }} == false ]]; then
           echo "Both 'add_repos' and 'update_repos' are disabled. Please enable at least one of them."
           exit 1
@@ -60,6 +58,13 @@ runs:
           echo "The 'one_pr' option doesn't work together with 'squash_commits' enabled. Please adjust accordingly."
           exit 1
         fi
+
+        if [[ "$repos_filename" == *.lua ]]; then
+          echo "Warning: 'repos_filename' contains '.lua' at the end. It is recommended to remove it."
+          repos_filename=$(echo "$repos_filename" | sed 's/\.lua//g')
+        fi
+
+        echo "repos_filename=$repos_filename" >> $GITHUB_ENV
     - name: Setup Git configurations
       shell: bash
       run: |
@@ -76,47 +81,28 @@ runs:
     - name: Update the repositories file
       shell: bash
       run: |
-        if [[ $(git diff --name-only origin/${GITHUB_REF##*/} ${{ inputs.repos_filename }}.lua) ]]; then
-          git rm ${{ inputs.repos_filename }}.lua || true
+        if [[ $(git diff --name-only origin/${GITHUB_REF##*/} $repos_filename.lua) ]]; then
+          git rm $repos_filename.lua || true
 
           default_branch=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
-          wget https://raw.githubusercontent.com/${{ github.repository }}/${default_branch}/${{ inputs.repos_filename }}.lua
+          wget https://raw.githubusercontent.com/${{ github.repository }}/${default_branch}/$repos_filename.lua
         fi
     - name: Setup Lua
       shell: bash
       run: |
         sudo apt-get -qq update
         sudo apt-get -qq install lua5.3
-    - name: Delete existing branches
-      shell: bash
-      run: |
-        if [[ ${{ inputs.update_repos }} == true ]] && [[ ${{ inputs.delete_existing_branches }} == true ]]; then
-          branches=$(lua -e 'local repos = require("${{ inputs.repos_filename }}").repos; dofile("${{ github.action_path }}/src/helper-functions.lua"); get_repo_branches(repos)')
-          for branch in ${branches[@]}; do
-            if git ls-remote --heads origin $branch | grep -q $branch; then
-              if git diff --name-only origin/${GITHUB_REF##*/} $branch | grep -q $branch; then
-                git push origin -d $branch
-              fi
-            fi
-          done
-
-          if git ls-remote --heads origin ${{ inputs.branch_name }} | grep -q ${{ inputs.branch_name }}; then
-            if git diff --name-only origin/${GITHUB_REF##*/} ${{ inputs.branch_name }} | grep -q ${{ inputs.branch_name }}; then
-              git push origin -d ${{ inputs.branch_name }}
-            fi
-          fi
-        fi
     - name: Run fetch-repos script
       shell: bash
       run: |
         if [[ ${{ inputs.add_repos }} == true ]]; then
-          lua ${{ github.action_path }}/src/fetch-repos.lua ${{ inputs.repos_filename }} ${{ inputs.squash_commits }} '${{ inputs.commit_message }}'
+          lua ${{ github.action_path }}/src/fetch-repos.lua '$repos_filename' ${{ inputs.squash_commits }} '${{ inputs.commit_message }}'
         fi
     - name: Run update-repos script
       shell: bash
       run: |
         if [[ ${{ inputs.update_repos }} == true ]]; then
-          lua ${{ github.action_path }}/src/update-repos.lua ${{ inputs.repos_filename }} ${{ inputs.squash_commits }} ${{ inputs.one_pr }} '${{ inputs.commit_message_update }}'
+          lua ${{ github.action_path }}/src/update-repos.lua '$repos_filename' ${{ inputs.squash_commits }} ${{ inputs.one_pr }} '${{ inputs.commit_message_update }}'
         fi
     - name: Push changes and create PR
       shell: bash
@@ -133,33 +119,37 @@ runs:
               git checkout ${{ inputs.branch_name }} || true
               git push origin ${{ inputs.branch_name }}:${{ inputs.branch_name }} || true
 
-              pr=$(gh pr list --base ${GITHUB_REF##*/} --head $branch)
-              pr_number=$(echo $pr | cut -d ' ' -f 1)
+              # Obtain the PR body and the necessary labels.
+              PR_BODY=$(bash ${{ github.action_path }}/src/tools/markdown_pr_body.sh "added" "false" "${{ github.action_path }}")
+              LABELS_FETCH=$(bash ${{ github.action_path }}/src/tools/fetch_labels.sh "${{ github.action_path }}" "$repos_filename" "fetch")
 
-              pr_body=$(bash ${{ github.action_path }}/src/tools/markdown_pr_body.sh "added" "false" "${{ github.action_path }}")
+              # Create the pull request with the given data.
+              gh pr create --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} --title '${{ inputs.commit_message }}' --body "Repositories were added or updated using the Submodules Alternative tool." || true
 
-              labels_fetch=$(lua -e 'local labels = require("${{ inputs.repos_filename }}").config; if labels.labels_fetch then print(labels.labels_fetch) end') || "repo-fetch,dependencies"
-              gh pr create --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} --title '${{ inputs.commit_message }}' --body "$(lua -e 'local config = require("${{ inputs.repos_filename }}").config; if config.fetch then print(config.fetch) else print("Repositories were added or updated using the Submodules Alternative tool.") end')" || true
-
+              # Edit the newly created PR by adding the specific labels with the given PR number.
               if [[ $(gh pr list --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }}) ]]; then
-                gh pr edit $pr_number --add-label $labels_fetch || true
+                PR_NUMBER=$(bash ${{ github.action_path }}/src/tools/pr_number.sh ${GITHUB_REF##*/} "${{ inputs.branch_name }}")
+                gh pr edit $PR_NUMBER --add-label $LABELS_FETCH || true
               fi
             elif [[ ${{ inputs.update_repos }} == true ]] && [[ ${{ inputs.add_repos }} == false ]]; then
               # The One PR option is available when updating the repositories.
-              branches=$(lua -e 'local repos = require("${{ inputs.repos_filename }}").repos; dofile("${{ github.action_path }}/src/helper-functions.lua"); get_repo_branches(repos)')
-              labels_update=$(lua -e 'local labels = require("${{ inputs.repos_filename }}").config; if labels.labels_update then print(labels.labels_update) end') || "dependencies"
 
-              for branch in ${branches[@]}; do
-                repo_name=${branch%-update}
-                pr_body=$(bash ${{ github.action_path }}/src/tools/markdown_pr_body.sh "updated" "true" "${{ github.action_path }}" $repo_name)
+              # Get the branches that will be used to create the PRs.
+              BRANCHES=$(lua -e 'local repos = require("$repos_filename").repos; dofile("${{ github.action_path }}/src/helper-functions.lua"); get_repo_branches(repos)')
+              LABELS_UPDATE=$(bash ${{ github.action_path }}/src/tools/fetch_labels.sh "${{ github.action_path }}" "$repos_filename" "update")
 
-                gh pr create --base ${GITHUB_REF##*/} --head $branch --title 'Bump `'$repo_name'` to its latest commit' --body "$pr_body" || true
+              for branch in ${BRANCHES[@]}; do
+                # Obtain the PR body and adjust it to the updated subtree.
+                REPO_NAME=${branch%-update}
+                PR_BODY=$(bash ${{ github.action_path }}/src/tools/markdown_pr_body.sh "updated" "true" "${{ github.action_path }}" "$repo_name")
 
+                # Create the PR with the given data.
+                gh pr create --base ${GITHUB_REF##*/} --head $branch --title 'Bump `'$repo_name'` to its latest commit' --body "$PR_BODY" || true
+
+                # Edit the newly created PR by adding the specific labels.
                 if [[ $(gh pr list --base ${GITHUB_REF##*/} --head $branch) ]]; then
-                  pr=$(gh pr list --base ${GITHUB_REF##*/} --head $branch)
-                  pr_number=$(echo $pr | cut -d ' ' -f 1)
-
-                  gh pr edit $pr_number --add-label "$labels_update" || true
+                  PR_NUMBER=$(bash ${{ github.action_path }}/src/tools/pr_number.sh ${GITHUB_REF##*/} "$branch")
+                  gh pr edit $PR_NUMBER --add-label "$LABELS_UPDATE" || true
                 fi
               done
             fi

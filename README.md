@@ -6,7 +6,7 @@
 [![Submodules Alternative](https://socialify.git.ci/Panquesito7/submodules-alternative/image?description=1&descriptionEditable=Easy-to-use%20Git%20modules%20alternative&font=Source%20Code%20Pro&issues=1&language=1&name=1&owner=1&pattern=Circuit%20Board&stargazers=1&theme=Auto)](https://github.com/Panquesito7/submodules-alternative)
 
 An easy-to-use Git (Sub)modules alternative to make the cloning process easier.\
-**The project is still WIP and still contains bugs. It is recommended to use it in small projects until the tool is fairly stable.**
+**The project is still WIP and still contains minor bugs. It is recommended to use it in small projects until the tool is fairly stable.**
 
 ## What's the difference?
 
@@ -86,7 +86,7 @@ jobs:
           fetch-depth: 0 # This pulls changes before doing any changes
       - uses: Panquesito7/submodules-alternative@v1.6.1
         with:
-          repos_filename: repos                       # In case your file is named `repos.lua`, you can leave it as `repos`.
+          repos_filename: repos.lua                   # Both `repos.lua` and `repos` will work.
           use_pr: true                                # Whether to create a pull request when updating/adding the repositories.
           branch_name: repo-update                    # The branch name to use (only if `use_pr` is enabled).
           commit_message: 'Update'                    # Commit message used when adding new repositories.
@@ -95,13 +95,12 @@ jobs:
           update_repos: true                          # When enabled, this will attempt to update all the repositories.
           squash_commits: false                       # Whether to squash all commits or not on every repository update/addition. Cannot be used if `one_pr` is disabled.
           one_pr: false                               # Creates one single PR for everything if enabled. Works only for `update_repos` if disabled.
-          delete_existing_branches: true              # Deletes the branches that updated the subtrees. Note that this is done only on action run, not on immediate PR merge.
 ```
 
 **Always use single-quoting for commit messages if you want to include special symbols such as `!`.**
 
-If `delete_existing_branches` is enabled, it will attempt to delete the branches before running the scripts to ensure there are no merge conflicts.\
-However, this is not the most efficient way of deleting the branches. These are other alternatives I recommend:
+After a PR is merged, its branch won't be automatically deleted, thus, the script will fail if there's a new update when the outdated branch still exists.\
+If you want your branches to automatically delete after being merged, you should consider one of the following options:
 
 1. Automatically [delete branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-the-automatic-deletion-of-branches) on PR merging (recommended).
 2. Manually delete the branches (not recommended).
@@ -127,7 +126,7 @@ For more information about Cron, you can check [CronHub](https://crontab.cronhub
 > `helper-functions.lua` for extra functions and safety checks.**
 
 ```bash
-lua fetch-repos.lua <repos_filename> <squash_commits> <commit_message> # No filename format required!
+lua fetch-repos.lua <repos_filename> <squash_commits> <commit_message>
 ```
 
 2. Once done, you can push changes. Committing is already done by the script.
@@ -138,19 +137,19 @@ git push
 
 **Please note that commit messages should include quoting (`''` or `""`), else, the script will detect it as multiple parameters.**
 
-3. Done! All of your repositories are now available in your project and can be updated later on. 🎉
+3. Done! All of your subtrees are now available in your project and can be updated later on. 🎉
 
-If you've updated your repositories list, you can always run the script again and it'll clone the new repositories.
+If you've updated your subtrees list, you can always run the script again and it'll clone the new subtrees.
 
-## Updating the repositories
+## Updating the subtrees
 
-By using GitHub Actions, the repositories will be updated automatically.\
+By using GitHub Actions, the subtrees will be updated automatically.\
 If you wish to do that manually, you can run the following script.
 
-**Remember to use `""` around the commit message!**
+**Remember to use (single-)quoting around the commit message!**
 
 ```bash
-lua update-repos.lua <repos_filename> <commit_message> <squash_commits> # No filename format required!
+lua update-repos.lua <repos_filename> <commit_message> <squash_commits>
 ```
 
 After running the script, you can push changes to the desired branch.\

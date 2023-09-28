@@ -7,9 +7,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: Panquesito7/submodules-alternative@main
+      - uses: ./
         with:
-          repos_filename: repos-test
+          repos_filename: repos-test.lua
           use_pr: true
           branch_name: submodule-update
           add_repos: true
