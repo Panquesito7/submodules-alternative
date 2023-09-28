@@ -6,7 +6,7 @@
 # [1]: The current branch name. Usually `${GITHUB_REF##*/}`
 # [2]: The branch name that has the new changes
 
-pr=$(gh pr list --base args[1] --head args[2])
+pr=$(gh pr list --base $1 --head $2)
 pr_number=$(echo $pr | cut -d' ' -f1)
 
 # Does it have any content?

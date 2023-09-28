@@ -121,7 +121,7 @@ runs:
 
               # Obtain the PR body and the necessary labels.
               PR_BODY=$(bash ${{ github.action_path }}/src/tools/markdown_pr_body.sh "added" "false" "${{ github.action_path }}")
-              LABELS_FETCH=$(bash ${{ github.action_path }}/src/tools/fetch_labels.sh "${{ github.action_path }}" "${{ env.REPOS_FILENAME }}" "fetch")
+              LABELS_FETCH=$(bash ${{ github.action_path }}/src/tools/fetch_labels.sh "${{ env.REPOS_FILENAME }}" "fetch")
 
               # Create the pull request with the given data.
               gh pr create --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} --title '${{ inputs.commit_message }}' --body "Repositories were added or updated using the Submodules Alternative tool." || true
@@ -136,7 +136,7 @@ runs:
 
               # Get the branches that will be used to create the PRs.
               BRANCHES=$(lua -e 'local repos = require("${{ env.REPOS_FILENAME }}").repos; dofile("${{ github.action_path }}/src/helper-functions.lua"); get_repo_branches(repos)')
-              LABELS_UPDATE=$(bash ${{ github.action_path }}/src/tools/fetch_labels.sh "${{ github.action_path }}" "${{ env.REPOS_FILENAME }}" "update")
+              LABELS_UPDATE=$(bash ${{ github.action_path }}/src/tools/fetch_labels.sh "${{ env.REPOS_FILENAME }}" "update")
 
               for branch in ${BRANCHES[@]}; do
                 # Obtain the PR body and adjust it to the updated subtree.
