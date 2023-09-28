@@ -1,3 +1,6 @@
+#!/bin/bash
+# Adjusts the template PR body files to be used in the PR.
+#
 # Arguments:
 # [0]: Taken by Bash, the name of the script
 # [1]: The mode that will be used to generate the PR body. Available modes are: "all", "updated", "added"
@@ -11,7 +14,6 @@
 if ([ "$1" == "all" ] || [ "$1" == "" ]) && [ "$2" == "false" ];
 then
     # Reads the files and stores the lines in arrays
-
     if [ -f updated_subtrees.txt ]; then
         mapfile -t updated_subtrees < updated_subtrees.txt
     fi
@@ -31,6 +33,7 @@ then
     # Creates a temporary file for the PR body
     cat "$3/src/tools/pr_body.txt" > TEMP.txt
 
+    # Replace the texts
     if test -s updated_subtrees.txt;
     then
         sed -i -e "s|{updated_subtrees}|$updated_subtrees_md|g" TEMP.txt
