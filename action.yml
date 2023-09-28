@@ -47,7 +47,7 @@ runs:
     - name: Make sure the configurations are valid
       shell: bash
       run: |
-        repos_filename="$repos_filename"
+        repos_filename=${{ inputs.repos_filename }}
 
         if [[ ${{ inputs.add_repos }} == false ]] && [[ ${{ inputs.update_repos }} == false ]]; then
           echo "Both 'add_repos' and 'update_repos' are disabled. Please enable at least one of them."
@@ -59,12 +59,12 @@ runs:
           exit 1
         fi
 
-        if [[ "$repos_filename" == *.lua ]]; then
+        if [[ $repos_filename == *.lua ]]; then
           echo "Warning: 'repos_filename' contains '.lua' at the end. It is recommended to remove it."
-          repos_filename=$(echo "$repos_filename" | sed 's/\.lua//g')
+          repos_filename=$(echo ${{ inputs.repos_filename }} | sed 's/\.lua//g')
         fi
 
-        echo "repos_filename=$repos_filename" >> $GITHUB_ENV
+        echo "REPOS_FILENAME=$repos_filename" >> $GITHUB_ENV
     - name: Setup Git configurations
       shell: bash
       run: |
@@ -81,11 +81,11 @@ runs:
     - name: Update the repositories file
       shell: bash
       run: |
-        if [[ $(git diff --name-only origin/${GITHUB_REF##*/} $repos_filename.lua) ]]; then
-          git rm $repos_filename.lua || true
+        if [[ $(git diff --name-only origin/${GITHUB_REF##*/} ${{ env.REPOS_FILENAME }}.lua) ]]; then
+          git rm ${{ env.REPOS_FILENAME }}.lua || true
 
           default_branch=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
-          wget https://raw.githubusercontent.com/${{ github.repository }}/${default_branch}/$repos_filename.lua
+          wget https://raw.githubusercontent.com/${{ github.repository }}/${default_branch}/${{ env.REPOS_FILENAME }}.lua
         fi
     - name: Setup Lua
       shell: bash
@@ -96,13 +96,13 @@ runs:
       shell: bash
       run: |
         if [[ ${{ inputs.add_repos }} == true ]]; then
-          lua ${{ github.action_path }}/src/fetch-repos.lua '$repos_filename' ${{ inputs.squash_commits }} '${{ inputs.commit_message }}'
+          lua ${{ github.action_path }}/src/fetch-repos.lua '${{ env.REPOS_FILENAME }}' ${{ inputs.squash_commits }} '${{ inputs.commit_message }}'
         fi
     - name: Run update-repos script
       shell: bash
       run: |
         if [[ ${{ inputs.update_repos }} == true ]]; then
-          lua ${{ github.action_path }}/src/update-repos.lua '$repos_filename' ${{ inputs.squash_commits }} ${{ inputs.one_pr }} '${{ inputs.commit_message_update }}'
+          lua ${{ github.action_path }}/src/update-repos.lua '${{ env.REPOS_FILENAME }}' ${{ inputs.squash_commits }} ${{ inputs.one_pr }} '${{ inputs.commit_message_update }}'
         fi
     - name: Push changes and create PR
       shell: bash
@@ -121,7 +121,7 @@ runs:
 
               # Obtain the PR body and the necessary labels.
               PR_BODY=$(bash ${{ github.action_path }}/src/tools/markdown_pr_body.sh "added" "false" "${{ github.action_path }}")
-              LABELS_FETCH=$(bash ${{ github.action_path }}/src/tools/fetch_labels.sh "${{ github.action_path }}" "$repos_filename" "fetch")
+              LABELS_FETCH=$(bash ${{ github.action_path }}/src/tools/fetch_labels.sh "${{ github.action_path }}" "${{ env.REPOS_FILENAME }}" "fetch")
 
               # Create the pull request with the given data.
               gh pr create --base ${GITHUB_REF##*/} --head ${{ inputs.branch_name }} --title '${{ inputs.commit_message }}' --body "Repositories were added or updated using the Submodules Alternative tool." || true
@@ -135,8 +135,8 @@ runs:
               # The One PR option is available when updating the repositories.
 
               # Get the branches that will be used to create the PRs.
-              BRANCHES=$(lua -e 'local repos = require("$repos_filename").repos; dofile("${{ github.action_path }}/src/helper-functions.lua"); get_repo_branches(repos)')
-              LABELS_UPDATE=$(bash ${{ github.action_path }}/src/tools/fetch_labels.sh "${{ github.action_path }}" "$repos_filename" "update")
+              BRANCHES=$(lua -e 'local repos = require("${{ env.REPOS_FILENAME }}").repos; dofile("${{ github.action_path }}/src/helper-functions.lua"); get_repo_branches(repos)')
+              LABELS_UPDATE=$(bash ${{ github.action_path }}/src/tools/fetch_labels.sh "${{ github.action_path }}" "${{ env.REPOS_FILENAME }}" "update")
 
               for branch in ${BRANCHES[@]}; do
                 # Obtain the PR body and adjust it to the updated subtree.
