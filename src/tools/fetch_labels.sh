@@ -8,10 +8,10 @@
 
 labels=""
 
-if [ "$3" == "fetch" ]; then
-    labels=$(lua -e 'local labels = require("$2").config; if labels.labels_fetch then print(labels.labels_fetch) end') || "repo-fetch,dependencies"
-elif [ "$3" == "update" ]; then
-    labels=$(lua -e 'local labels = require("$2").config; if labels.labels_update then print(labels.labels_update) end') || "dependencies"
+if [ "$2" == "fetch" ]; then
+    labels=$(lua -e 'local labels = require("$1").config; if labels.labels_fetch then print(labels.labels_fetch) end') || "repo-fetch,dependencies"
+elif [ "$2" == "update" ]; then
+    labels=$(lua -e 'local labels = require("$1").config; if labels.labels_update then print(labels.labels_update) end') || "dependencies"
 else
     # Invalid mode. Basic labels will be used instead.
     labels="dependencies"
