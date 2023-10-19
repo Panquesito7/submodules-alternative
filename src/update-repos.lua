@@ -125,10 +125,6 @@ local function update_repos()
         end
 
         if squash_commits == "false" then
-            -- Setup Git username/mail locally.
-            os.execute("git config --local user.name github-actions[bot]")
-            os.execute("git config --local user.email 'github-actions[bot]@users.noreply.github.com'")
-
             os.execute("git commit -m 'Bump `" .. repos[i].name .. "` to its latest commit'")
         end
 

@@ -13,9 +13,10 @@ labels=""
 dependencies_label_regex='^[^/]*[Dd][Ee][Pp]endenc[^/]+$'
 
 if [ "$2" == "fetch" ]; then
-    labels=$(lua -e 'local labels = require("$1").config; if labels.labels_fetch then print(labels.labels_fetch) end') || "repo-fetch,dependencies"
+    # Find a way to use a Bash argument in a Lua script
+    labels=$(lua -e "local labels = require("$1").config; if labels.labels_fetch then print(labels.labels_fetch) end") || echo "repo-fetch,dependencies"
 elif [ "$2" == "update" ]; then
-    labels=$(lua -e 'local labels = require("$1").config; if labels.labels_update then print(labels.labels_update) end') || "dependencies"
+    labels=$(lua -e "local labels = require("$1").config; if labels.labels_update then print(labels.labels_update) end") || echo "dependencies"
 else
     # Invalid mode. Use the regex to search for the closest match.
     repo_labels=$(gh api repos/$3/labels | jq -r '.[].name')

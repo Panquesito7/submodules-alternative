@@ -161,4 +161,4 @@ All the pending work and to-do list can be found here: <https://github.com/users
 
 ## License
 
-See [`LICENSE`](LICENSE) for full information.
+See [`LICENSE.md`](LICENSE.md) for full information.

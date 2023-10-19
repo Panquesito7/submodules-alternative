@@ -14,6 +14,7 @@ local repos = {
     -- Add any other repositories here.
 }
 
+-- This is required so that other files can access the configurations.
 return {
     repos = repos,
     config = config
